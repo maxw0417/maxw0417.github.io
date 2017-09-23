@@ -155,6 +155,93 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Android自定义控件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/23/Android自定义控件/">Android自定义控件</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/23/Android自定义控件/" class="archive-article-date">
+  	<time datetime="2017-09-23T11:55:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="自定义属性"><a href="#自定义属性" class="headerlink" title="自定义属性"></a>自定义属性</h2><h3 id="属性的定义"><a href="#属性的定义" class="headerlink" title="属性的定义"></a>属性的定义</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;resources&gt;</div><div class="line"></div><div class="line">    &lt;declare-styleable name=&quot;test&quot;&gt;</div><div class="line">        &lt;attr name=&quot;text&quot; format=&quot;string&quot; /&gt;</div><div class="line">        &lt;attr name=&quot;testAttr&quot; format=&quot;integer&quot; /&gt;</div><div class="line">    &lt;/declare-styleable&gt;</div><div class="line"></div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
+<h3 id="属性的使用"><a href="#属性的使用" class="headerlink" title="属性的使用"></a>属性的使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</div><div class="line">    xmlns:zhy=&quot;http://schemas.android.com/apk/res/com.example.test&quot;</div><div class="line">    android:layout_width=&quot;match_parent&quot;</div><div class="line">    android:layout_height=&quot;match_parent&quot; &gt;</div><div class="line"></div><div class="line">    &lt;com.example.test.MyTextView</div><div class="line">        android:layout_width=&quot;100dp&quot;</div><div class="line">        android:layout_height=&quot;200dp&quot;</div><div class="line">        zhy:testAttr=&quot;520&quot;</div><div class="line">        zhy:text=&quot;helloworld&quot; /&gt;</div><div class="line"></div><div class="line">&lt;/RelativeLayout&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">package com.example.test;</div><div class="line"></div><div class="line">import android.content.Context;</div><div class="line">import android.content.res.TypedArray;</div><div class="line">import android.util.AttributeSet;</div><div class="line">import android.util.Log;</div><div class="line">import android.view.View;</div><div class="line"></div><div class="line">public class MyTextView extends View &#123;</div><div class="line"></div><div class="line">    private static final String TAG = MyTextView.class.getSimpleName();</div><div class="line"></div><div class="line">    public MyTextView(Context context, AttributeSet attrs) &#123;</div><div class="line">        super(context, attrs);</div><div class="line"></div><div class="line">        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.test);</div><div class="line"></div><div class="line">        String text = ta.getString(R.styleable.test_testAttr);</div><div class="line">        int textAttr = ta.getInteger(R.styleable.test_text, -1);</div><div class="line"></div><div class="line">        Log.e(TAG, &quot;text = &quot; + text + &quot; , textAttr = &quot; + textAttr);</div><div class="line"></div><div class="line">        ta.recycle();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="自定义view"><a href="#自定义view" class="headerlink" title="自定义view"></a>自定义view</h2><p>自定义view由于没有子view了，所以不需要考虑子view的大小和位置，所以只需要做一下几个功能：</p>
+<p>1.重写onMeasure方法，确定自己的大小</p>
+<p>一般来说，就是根据三种模式来设置宽高的值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">int widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">int widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line"></div><div class="line">//MeasureSpec.EXACTLY:精确值，直接将值widthSize就行了。</div><div class="line"></div><div class="line">//MeasureSpec.AT_MOST:只要不超过widthSize就可以了。</div><div class="line"></div><div class="line">//MeasureSpec.UNSPECIFIED:可以随便设值，一般可以设置一个默认值。view中的处理方法是：mMinWidth和背景图宽，哪个大就哪个</div></pre></td></tr></table></figure></p>
+<p>2.重写onDraw方法，绘制自己的内容</p>
+<blockquote>
+<p>注意，自定义view不需要重写onlayout，view自己的位置在layout中就已经搞定了，onlayout是viewgroup用来设置子view位置的：child.layout(l,t,r,b);</p>
+</blockquote>
+<h2 id="自定义viewgroup"><a href="#自定义viewgroup" class="headerlink" title="自定义viewgroup"></a>自定义viewgroup</h2><p>1.重写onMeasure,工作是设置自己的宽高，以及根据子view的layoutparams，计算子view的宽高。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">	 * 计算所有ChildView的宽度和高度 然后根据ChildView的计算结果，设置自己的宽和高</div><div class="line">	 */</div><div class="line">	@Override</div><div class="line">	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)</div><div class="line">	&#123;</div><div class="line">		/**</div><div class="line">		 * 获得此ViewGroup上级容器为其推荐的宽和高，以及计算模式</div><div class="line">		 */</div><div class="line">		int widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">		int heightMode = MeasureSpec.getMode(heightMeasureSpec);</div><div class="line">		int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">		int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);</div><div class="line"></div><div class="line"></div><div class="line">		// 计算出所有的childView的宽和高</div><div class="line">		measureChildren(widthMeasureSpec, heightMeasureSpec);</div><div class="line">		/**</div><div class="line">		 * 记录如果是wrap_content是设置的宽和高</div><div class="line">		 */</div><div class="line">		int width = 0;</div><div class="line">		int height = 0;</div><div class="line"></div><div class="line">		int cCount = getChildCount();</div><div class="line"></div><div class="line">		int cWidth = 0;</div><div class="line">		int cHeight = 0;</div><div class="line">		MarginLayoutParams cParams = null;</div><div class="line"></div><div class="line">		// 用于计算左边两个childView的高度</div><div class="line">		int lHeight = 0;</div><div class="line">		// 用于计算右边两个childView的高度，最终高度取二者之间大值</div><div class="line">		int rHeight = 0;</div><div class="line"></div><div class="line">		// 用于计算上边两个childView的宽度</div><div class="line">		int tWidth = 0;</div><div class="line">		// 用于计算下面两个childiew的宽度，最终宽度取二者之间大值</div><div class="line">		int bWidth = 0;</div><div class="line"></div><div class="line">		/**</div><div class="line">		 * 根据childView计算的出的宽和高，以及设置的margin计算容器的宽和高，主要用于容器是warp_content时</div><div class="line">		 */</div><div class="line">		for (int i = 0; i &lt; cCount; i++)</div><div class="line">		&#123;</div><div class="line">			View childView = getChildAt(i);</div><div class="line">			cWidth = childView.getMeasuredWidth();</div><div class="line">			cHeight = childView.getMeasuredHeight();</div><div class="line">			cParams = (MarginLayoutParams) childView.getLayoutParams();</div><div class="line"></div><div class="line">			// 上面两个childView</div><div class="line">			if (i == 0 || i == 1)</div><div class="line">			&#123;</div><div class="line">				tWidth += cWidth + cParams.leftMargin + cParams.rightMargin;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			if (i == 2 || i == 3)</div><div class="line">			&#123;</div><div class="line">				bWidth += cWidth + cParams.leftMargin + cParams.rightMargin;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			if (i == 0 || i == 2)</div><div class="line">			&#123;</div><div class="line">				lHeight += cHeight + cParams.topMargin + cParams.bottomMargin;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			if (i == 1 || i == 3)</div><div class="line">			&#123;</div><div class="line">				rHeight += cHeight + cParams.topMargin + cParams.bottomMargin;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		width = Math.max(tWidth, bWidth);</div><div class="line">		height = Math.max(lHeight, rHeight);</div><div class="line"></div><div class="line">		/**</div><div class="line">		 * 如果是wrap_content设置为我们计算的值</div><div class="line">		 * 否则：直接设置为父容器计算的值</div><div class="line">		 */</div><div class="line">		setMeasuredDimension((widthMode == MeasureSpec.EXACTLY) ? sizeWidth</div><div class="line">				: width, (heightMode == MeasureSpec.EXACTLY) ? sizeHeight</div><div class="line">				: height);</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>示例2，在父viewgroup的onMeasure中，指定子view的宽高：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">for (int i = 0; i &lt; getChildCount(); i++) &#123;</div><div class="line">			View v = getChildAt(i);</div><div class="line"></div><div class="line">			int widthSpec = 0;</div><div class="line">			int heightSpec = 0;</div><div class="line">			LayoutParams params = v.getLayoutParams();</div><div class="line">			if (params.width &gt; 0) &#123;</div><div class="line">				widthSpec = MeasureSpec.makeMeasureSpec(params.width,</div><div class="line">						MeasureSpec.EXACTLY);</div><div class="line">			&#125; else if (params.width == -1) &#123;</div><div class="line">			    // 子view的layoutparams为match_parent</div><div class="line">				widthSpec = MeasureSpec.makeMeasureSpec(measureWidth,</div><div class="line">						MeasureSpec.EXACTLY);</div><div class="line">			&#125; else if (params.width == -2) &#123;</div><div class="line">			 // 子view的layoutparams为wrap_content</div><div class="line">				widthSpec = MeasureSpec.makeMeasureSpec(measureWidth,</div><div class="line">						MeasureSpec.AT_MOST);</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			if (params.height &gt; 0) &#123;</div><div class="line">				heightSpec = MeasureSpec.makeMeasureSpec(params.height,</div><div class="line">						MeasureSpec.EXACTLY);</div><div class="line">			&#125; else if (params.height == -1) &#123;</div><div class="line">				heightSpec = MeasureSpec.makeMeasureSpec(measureHeight,</div><div class="line">						MeasureSpec.EXACTLY);</div><div class="line">			&#125; else if (params.height == -2) &#123;</div><div class="line">				heightSpec = MeasureSpec.makeMeasureSpec(measureWidth,</div><div class="line">						MeasureSpec.AT_MOST);</div><div class="line">			&#125;</div><div class="line">			v.measure(widthSpec, heightSpec);</div><div class="line"></div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
+<p>2.重写onLayout,这个方法在viewgroup中抽象方法，自定义viewgroup必须重写它。它的工作是放置子view，也就是决定各个子view的位置,通过一些规则算出各个子view的位置，然后通过view的layout方法，设置子view的位置，即子view的左上右下四个参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">child.layout(left, top, left + width, top + height);</div></pre></td></tr></table></figure></p>
+<p>3.如有需要，可以复写onDraw,绘制自己的内容，例如分割线之类的。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">自定义控件</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/23/Android自定义控件/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Android触摸事件分发机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -697,6 +784,10 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
