@@ -662,7 +662,7 @@
 <p>###move、up事件与down事件的关系<br>down事件是一组触摸事件的开始，它决定了后续事件，例如move、up等事件的走向。<br>实际上，down事件最终流向哪里（被哪个view消费掉），后续的所有事件也都流向同一个地方，由同一个view消费。</p>
 <p><br><br><br></p>
 <h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><h4 id="事件是从外层view逐步往内层view传递的"><a href="#事件是从外层view逐步往内层view传递的" class="headerlink" title="事件是从外层view逐步往内层view传递的"></a>事件是从外层view逐步往内层view传递的</h4><p>view中消费事件的地方有两个，onTouchEvent方法以及dispatchTouchEvent方法，这两个方法只要返回true，就表示事件被消费了，不会被继续传递了</p>
-<p>####每一层view都可以做出三种决定：<br>1.自己消费：<br>对于view来说，默认就是自己消费，即view的dispatchTouchEvent会将事件送入自己的onTouchEvent进行处理。<br>对于viewgroup来说，需要在onInterceptTouchEvent方法种返回true，这样事件就将被送往自己的onTouchEvent进行处理。<br>2.传递给内层<br>对于view来说，没有内层的view了，所以不存在继续往内层传递的情况。<br>对于viewgroup来说，只要onInterceptTouchEvent方法返回false，就会通过调用内层view的dispatchTouchEvent，将事件送入内层的view中。<br>3.返回给外层<br>这里说的返回给外层，实际上并不是直接返回去，而是内层和自己都已经处理过一遍了，只不过并没有“消费掉”，也就是onTouchEvent没有返回true，dispatchTouchEvent也没有返回true，所以事件被逐层往外层退回去。</p>
+<h4 id="每一层view都可以做出三种决定"><a href="#每一层view都可以做出三种决定" class="headerlink" title="每一层view都可以做出三种决定"></a>每一层view都可以做出三种决定</h4><p>1.自己消费：<br>对于view来说，默认就是自己消费，即view的dispatchTouchEvent会将事件送入自己的onTouchEvent进行处理。<br>对于viewgroup来说，需要在onInterceptTouchEvent方法种返回true，这样事件就将被送往自己的onTouchEvent进行处理。<br>2.传递给内层<br>对于view来说，没有内层的view了，所以不存在继续往内层传递的情况。<br>对于viewgroup来说，只要onInterceptTouchEvent方法返回false，就会通过调用内层view的dispatchTouchEvent，将事件送入内层的view中。<br>3.返回给外层<br>这里说的返回给外层，实际上并不是直接返回去，而是内层和自己都已经处理过一遍了，只不过并没有“消费掉”，也就是onTouchEvent没有返回true，dispatchTouchEvent也没有返回true，所以事件被逐层往外层退回去。</p>
 
       
 
@@ -1215,7 +1215,7 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
     
     	<section class="tools-section tools-section-me" q-show="aboutme">
   	  	
-  	  		<div class="aboutme-wrap" id="js-aboutme">Android开发工程师&lt;br&gt;&lt;br&gt;&lt;br&gt;谢谢大家</div>
+  	  		<div class="aboutme-wrap" id="js-aboutme">专注Android开发&lt;br&gt;&lt;br&gt;&lt;br&gt;谢谢大家</div>
   	  	
     	</section>
     
