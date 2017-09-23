@@ -12,10 +12,10 @@
 <meta name="keywords" content="事件分发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android触摸事件分发机制">
-<meta property="og:url" content="http://yoursite.com/2017/09/23/触摸事件分发机制/index.html">
+<meta property="og:url" content="http://yoursite.com/2017/09/23/Android触摸事件分发机制/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。View的相关函数：1234567public boolean onTouchEvent(MotionEvent event) &amp;#123;    ...&amp;#125;public">
-<meta property="og:updated_time" content="2017-09-23T11:46:17.000Z">
+<meta property="og:updated_time" content="2017-09-23T11:50:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android触摸事件分发机制">
 <meta name="twitter:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。View的相关函数：1234567public boolean onTouchEvent(MotionEvent event) &amp;#123;    ...&amp;#125;public">
@@ -158,7 +158,7 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-触摸事件分发机制" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Android触摸事件分发机制" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
@@ -170,8 +170,8 @@
   
 
         
-        <a href="/2017/09/23/触摸事件分发机制/" class="archive-article-date">
-  	<time datetime="2017-09-23T08:22:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
+        <a href="/2017/09/23/Android触摸事件分发机制/" class="archive-article-date">
+  	<time datetime="2017-09-23T11:49:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
 </a>
         
       </header>
@@ -180,14 +180,12 @@
       
         <p>view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。<br>View的相关函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>viewgroup的相关函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// viewgoup中独有的函数，默认返回false，即不拦截事件，事件将从父view传递到子view的dispatchTouchEvent中去。</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onInterceptTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">//注意，viewgroup中dispatchTouchEvent已经被override了。</span></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>###dispatchTouchEvent<br>      控件中第一个收到事件的就是dispatchTouchEvent函数，起到分发作用，此函数在view和viewgroup中都有，但实现并不相同，因此作用也有所区别。在view中，dispatchTouchEvent最终会调用view的onTouch方法对事件进行处理。在viewgroup中，会先通过onInterceptTouchEvent判断是否需要拦截事件，如果需要拦截，事件就流入自己的onTouchEvent中进行处理，如果不拦截，事件将传入子view（或viewgroup）的dispatchTouchEvent中。dispatchTouchEvent返回false时，事件流入父view的onTouchEvent方法中。</p>
-<p>###onTouchEvent<br>1、viewgroup，view中都有<br>2、处理touch事件的地方，若返回true，表示事件处理完毕，若返回false，事件将返回至父viewgroup的onTouch中进行处理。</p>
-<p>###onInterceptTouchEvent<br>1、此函数时viewgroup中才有，view中是没有的<br>2、在默认实现下，此函数是viewgroup用来判断是否拦截事件的依据，若onInterceptTouchEvent返回值是false，则viewgroup不会拦截此事件，事件将继续传递给子view，若返回值是true，则viewgroup会拦截此事件，将事件送往viewgroup的onTouchEvent中进行处理</p>
+<h3 id="dispatchTouchEvent"><a href="#dispatchTouchEvent" class="headerlink" title="dispatchTouchEvent"></a>dispatchTouchEvent</h3><pre><code>控件中第一个收到事件的就是dispatchTouchEvent函数，起到分发作用，此函数在view和viewgroup中都有，但实现并不相同，因此作用也有所区别。在view中，dispatchTouchEvent最终会调用view的onTouch方法对事件进行处理。在viewgroup中，会先通过onInterceptTouchEvent判断是否需要拦截事件，如果需要拦截，事件就流入自己的onTouchEvent中进行处理，如果不拦截，事件将传入子view（或viewgroup）的dispatchTouchEvent中。dispatchTouchEvent返回false时，事件流入父view的onTouchEvent方法中。
+</code></pre><h3 id="onTouchEvent"><a href="#onTouchEvent" class="headerlink" title="onTouchEvent"></a>onTouchEvent</h3><p>1、viewgroup，view中都有<br>2、处理touch事件的地方，若返回true，表示事件处理完毕，若返回false，事件将返回至父viewgroup的onTouch中进行处理。</p>
+<h3 id="onInterceptTouchEvent"><a href="#onInterceptTouchEvent" class="headerlink" title="onInterceptTouchEvent"></a>onInterceptTouchEvent</h3><p>1、此函数时viewgroup中才有，view中是没有的<br>2、在默认实现下，此函数是viewgroup用来判断是否拦截事件的依据，若onInterceptTouchEvent返回值是false，则viewgroup不会拦截此事件，事件将继续传递给子view，若返回值是true，则viewgroup会拦截此事件，将事件送往viewgroup的onTouchEvent中进行处理</p>
 <p>###move、up事件与down事件的关系<br>down事件是一组触摸事件的开始，它决定了后续事件，例如move、up等事件的走向。<br>实际上，down事件最终流向哪里（被哪个view消费掉），后续的所有事件也都流向同一个地方，由同一个view消费。</p>
 <p><br><br><br></p>
-<p>###总结：</p>
-<p>####事件是从外层view逐步往内层view传递的</p>
-<p>###view中消费事件的地方有两个，onTouchEvent方法以及dispatchTouchEvent方法，这两个方法只要返回true，就表示事件被消费了，不会被继续传递了</p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><h4 id="事件是从外层view逐步往内层view传递的"><a href="#事件是从外层view逐步往内层view传递的" class="headerlink" title="事件是从外层view逐步往内层view传递的"></a>事件是从外层view逐步往内层view传递的</h4><p>view中消费事件的地方有两个，onTouchEvent方法以及dispatchTouchEvent方法，这两个方法只要返回true，就表示事件被消费了，不会被继续传递了</p>
 <p>####每一层view都可以做出三种决定：<br>1.自己消费：<br>对于view来说，默认就是自己消费，即view的dispatchTouchEvent会将事件送入自己的onTouchEvent进行处理。<br>对于viewgroup来说，需要在onInterceptTouchEvent方法种返回true，这样事件就将被送往自己的onTouchEvent进行处理。<br>2.传递给内层<br>对于view来说，没有内层的view了，所以不存在继续往内层传递的情况。<br>对于viewgroup来说，只要onInterceptTouchEvent方法返回false，就会通过调用内层view的dispatchTouchEvent，将事件送入内层的view中。<br>3.返回给外层<br>这里说的返回给外层，实际上并不是直接返回去，而是内层和自己都已经处理过一遍了，只不过并没有“消费掉”，也就是onTouchEvent没有返回true，dispatchTouchEvent也没有返回true，所以事件被逐层往外层退回去。</p>
 
       
@@ -279,7 +277,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/23/触摸事件分发机制/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/23/Android触摸事件分发机制/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -293,18 +291,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/09/23/Github+Hexo个人博客搭建/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Github+Hexo个人博客搭建
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/09/23/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hello World</div>
+    <a href="/2017/09/23/Glide的简单使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Glide的简单使用</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -430,15 +419,7 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio, IDE</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -446,11 +427,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">hexo博客搭建</a>
+                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
+                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
             
             <div class="clearfix"></div>
