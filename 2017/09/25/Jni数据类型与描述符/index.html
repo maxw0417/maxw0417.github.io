@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | 米兰的小铁铺</title>
+  <title>Jni数据类型与描述符 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="米兰的小铁铺">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+  <meta name="description" content="基本数据类型   java type jni type description     boolean jboolean unsigned 8 bits   byte jbyte signed 8 bits   char jchar unsigned 16 bits   shot jshort signed 16 bits   int jint signed 32 bits   long jlon">
+<meta name="keywords" content="Jni">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jni数据类型与描述符">
+<meta property="og:url" content="http://yoursite.com/2017/09/25/Jni数据类型与描述符/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
+<meta property="og:description" content="基本数据类型   java type jni type description     boolean jboolean unsigned 8 bits   byte jbyte signed 8 bits   char jchar unsigned 16 bits   shot jshort signed 16 bits   int jint signed 32 bits   long jlon">
+<meta property="og:updated_time" content="2017-09-25T05:55:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="米兰的小铁铺">
+<meta name="twitter:title" content="Jni数据类型与描述符">
+<meta name="twitter:description" content="基本数据类型   java type jni type description     boolean jboolean unsigned 8 bits   byte jbyte signed 8 bits   char jchar unsigned 16 bits   shot jshort signed 16 bits   int jint signed 32 bits   long jlon">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -157,36 +162,192 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Jni数据类型与描述符" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/Jni数据类型与描述符/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:54:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/Jni数据类型与描述符/">Jni数据类型与描述符</a>
+    <h1 class="article-title" itemprop="name">
+      Jni数据类型与描述符
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/09/25/Jni数据类型与描述符/" class="archive-article-date">
+  	<time datetime="2017-09-25T05:54:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h2><table>
+<thead>
+<tr>
+<th>java type</th>
+<th>jni type</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>jboolean</td>
+<td>unsigned 8 bits</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>jbyte</td>
+<td>signed 8 bits</td>
+</tr>
+<tr>
+<td>char</td>
+<td>jchar</td>
+<td>unsigned 16 bits</td>
+</tr>
+<tr>
+<td>shot</td>
+<td>jshort</td>
+<td>signed 16 bits</td>
+</tr>
+<tr>
+<td>int</td>
+<td>jint</td>
+<td>signed 32 bits</td>
+</tr>
+<tr>
+<td>long</td>
+<td>jlong</td>
+<td>signed 64bits</td>
+</tr>
+<tr>
+<td>float</td>
+<td>jfloat</td>
+<td>32 bits</td>
+</tr>
+<tr>
+<td>double</td>
+<td>jdouble</td>
+<td>64 bits</td>
+</tr>
+<tr>
+<td>void</td>
+<td>void</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h2 id="引用数据类型"><a href="#引用数据类型" class="headerlink" title="引用数据类型"></a>引用数据类型</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jobject                         (all Java objects)</div><div class="line">|</div><div class="line">|-- jclass                      (java.lang.Class objects)</div><div class="line">|-- jstring                     (java.lang.String objects)</div><div class="line">|-- jarray                      (array)</div><div class="line">|      |--jobjectArray          (object arrays)</div><div class="line">|      |--jbooleanArray         (boolean arrays)</div><div class="line">|      |--jbyteArray            (byte arrays)</div><div class="line">|      |--jcharArray            (char arrays)</div><div class="line">|      |--jshortArray           (short arrays)</div><div class="line">|      |--jintArray             (int arrays)</div><div class="line">|     |--jlongArray             (long arrays)</div><div class="line">|      |--jfloatArray           (float arrays)</div><div class="line">|      |--jdoubleArray          (double arrays)</div><div class="line">|</div><div class="line">|--jthrowable</div></pre></td></tr></table></figure>
+<h2 id="方法和变量ID"><a href="#方法和变量ID" class="headerlink" title="方法和变量ID"></a>方法和变量ID</h2><p>当需要调用Java中的某个方法的时候我们首先要获取它的ID，根据ID调用JNI函数获取该方法，变量的获取过程也是同样的过程，这些ID的结构体定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">struct _jfieldID;              /* opaque structure */ </div><div class="line">typedef struct _jfieldID *jfieldID;   /* field IDs */ </div><div class="line"></div><div class="line">struct _jmethodID;              /* opaque structure */ </div><div class="line">typedef struct _jmethodID *jmethodID; /* method IDs */</div></pre></td></tr></table></figure></p>
+<h2 id="描述符"><a href="#描述符" class="headerlink" title="描述符"></a>描述符</h2><h3 id="类描述符"><a href="#类描述符" class="headerlink" title="类描述符"></a>类描述符</h3><p>举个例子,一个java类com.github.songnick.jni.AndroidJni，它的类描述符为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">com/github/songnick/jni/AndroidJni</div></pre></td></tr></table></figure></p>
+<p>即把.换成/</p>
+<h3 id="方法描述符"><a href="#方法描述符" class="headerlink" title="方法描述符"></a>方法描述符</h3><p>用来确定native方法的参数和返回值。<br>不多解释，直接看例子就懂：</p>
+<table>
+<thead>
+<tr>
+<th>描述符</th>
+<th>java方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“()Ljava/lang/String;”</td>
+<td>String f()</td>
+</tr>
+<tr>
+<td>“(ILjava/lang/Class;)J”</td>
+<td>long f(int i, Class c);</td>
+</tr>
+</tbody>
+</table>
+<p>括号内的是参数的数据类型描述符；</p>
+<p>括号后的湿返回值的数据类型描述符；</p>
+<h3 id="数据类型描述符"><a href="#数据类型描述符" class="headerlink" title="数据类型描述符"></a>数据类型描述符</h3><table>
+<thead>
+<tr>
+<th>描述符</th>
+<th>数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>B</td>
+<td>byte</td>
+</tr>
+<tr>
+<td>C</td>
+<td>short</td>
+</tr>
+<tr>
+<td>S</td>
+<td>char</td>
+</tr>
+<tr>
+<td>I</td>
+<td>int</td>
+</tr>
+<tr>
+<td>J</td>
+<td>long</td>
+</tr>
+<tr>
+<td>F</td>
+<td>float</td>
+</tr>
+<tr>
+<td>D</td>
+<td>double</td>
+</tr>
+<tr>
+<td>V</td>
+<td>void</td>
+</tr>
+<tr>
+<td>“Ljava/lang/String;”</td>
+<td>String</td>
+</tr>
+<tr>
+<td>“[Ljava/lang/Object;”</td>
+<td>Object[]</td>
+</tr>
+</tbody>
+</table>
+<p>引用型数据类型以L开头，以；结尾。</p>
+<p>数组用[表示，二维数组就是[[，三维数组[[[</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -198,364 +359,118 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/25/Jni数据类型与描述符/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/几种排序算法实例/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:52:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2017/09/25/几种排序算法实例/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">几种排序算法实例</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/几种排序算法实例/">几种排序算法实例</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本数据类型"><span class="toc-number">1.</span> <span class="toc-text">基本数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#引用数据类型"><span class="toc-number">2.</span> <span class="toc-text">引用数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方法和变量ID"><span class="toc-number">3.</span> <span class="toc-text">方法和变量ID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#描述符"><span class="toc-number">4.</span> <span class="toc-text">描述符</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#类描述符"><span class="toc-number">4.1.</span> <span class="toc-text">类描述符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法描述符"><span class="toc-number">4.2.</span> <span class="toc-text">方法描述符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据类型描述符"><span class="toc-number">4.3.</span> <span class="toc-text">数据类型描述符</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/gcc的简单实用/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:48:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/gcc的简单实用/">gcc的简单使用</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">linux c</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/http协议总结/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:46:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/http协议总结/">http协议总结</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">web</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/cookie与session/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:44:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/cookie与session/">cookie与session</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">web</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/Android-Studio中的六种依赖/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:39:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/Android-Studio中的六种依赖/">Android Studio中的六种依赖</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Android Studio</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/随笔/" class="archive-article-date">
-  	<time datetime="2017-09-23T14:19:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/随笔/">随笔</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/git的配置/" class="archive-article-date">
-  	<time datetime="2017-09-23T12:02:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/git的配置/">git的配置</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/git的远程操作/" class="archive-article-date">
-  	<time datetime="2017-09-23T12:00:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/git的远程操作/">git的远程操作</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/git的分支管理和版本管理/" class="archive-article-date">
-  	<time datetime="2017-09-23T12:00:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/git的分支管理和版本管理/">git的分支管理和版本管理</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="extend next" rel="next" href="/archives/page/2/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -579,8 +494,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
