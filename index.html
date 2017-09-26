@@ -245,6 +245,281 @@
 
 
   
+    <article id="post-工厂模式" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/工厂模式/">工厂模式</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/工厂模式/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:54:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>建造型设计模式</p>
+</blockquote>
+<p>工厂模式的形态<br>工厂模式主要用一下几种形态：</p>
+<p>1：简单工厂（Simple Factory）。可以归为一种特殊的工厂方法模式。</p>
+<p>2：工厂方法（Factory Method）。</p>
+<p>3：抽象工厂（Abstract Factory）。</p>
+<h2 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h2><p>又叫做静态工厂方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//抽象产品</div><div class="line">public interface people&#123;</div><div class="line">      public void say();</div><div class="line">&#125;</div><div class="line">//具体产品</div><div class="line">public class chinese implements people&#123;</div><div class="line">      public void say()&#123;</div><div class="line">           System.out.println(&quot;说中国话&quot;);</div><div class="line">     &#125;</div><div class="line">&#125;</div><div class="line">//具体产品</div><div class="line">public class american implements people&#123;</div><div class="line">      public void say()&#123;</div><div class="line">           System.out.println(&quot;speak english&quot;);</div><div class="line">     &#125;</div><div class="line">&#125;</div><div class="line">//工厂类</div><div class="line">public class peopleFactory&#123;</div><div class="line">    </div><div class="line">      //静态工厂方法，返回类型是接口，实际返回的是接口的实现类</div><div class="line">      public static people create(int type)&#123;</div><div class="line">           if(type==1)&#123;</div><div class="line">                  return new chinese();</div><div class="line">           &#125;else if(type==2)&#123;</div><div class="line">                 return new american();</div><div class="line">           &#125;</div><div class="line">     &#125;</div><div class="line"> &#125;</div><div class="line"> //客户端</div><div class="line">public class test&#123;</div><div class="line">      public static void main(String []args)&#123;</div><div class="line">           people p=peopleFactory.create(1);</div><div class="line">           p.say();</div><div class="line">           p=peopleFactory.create(2);</div><div class="line">            p.say();</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>可见，简单工厂模式，只有一个具体的工厂类，没有抽象的工厂接口，也就没有接口的其他实现类了。<br>这个工厂生产什么样的产品，完全依赖工厂类中的工厂方法，同一个工厂方法的不同参数，或者不同的工厂方法，或者不同的方法+不同的方法参数，这些不同，决定了生产哪些不同的产品。</p>
+<h2 id="工厂方法"><a href="#工厂方法" class="headerlink" title="工厂方法"></a>工厂方法</h2><p>是简单工厂的衍生，解决了简单工厂的一些问题。</p>
+<p>首先完全实现‘开－闭 原则’，实现了可扩展。其次更复杂的层次结构，可以应用于产品结果复杂的场合。 　<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">//抽象产品</div><div class="line">public interface Icar&#123;</div><div class="line">           public void docar();</div><div class="line">&#125; </div><div class="line">//实体产品A</div><div class="line">public class bwm implements Icar&#123;</div><div class="line">          public void docar()&#123;</div><div class="line">               System.out.println(&quot;我是宝马，别摸我&quot;);</div><div class="line">          &#125;</div><div class="line">&#125;</div><div class="line"> //实体产品B</div><div class="line">public class buick implements Icar&#123;</div><div class="line">          public void docar()&#123;</div><div class="line">               System.out.println(&quot;我是别克，很酷&quot;);</div><div class="line">          &#125;</div><div class="line">&#125;</div><div class="line">//抽象工厂</div><div class="line">public interface Icarfactory&#123;</div><div class="line">          public Icar createCar();</div><div class="line">&#125; </div><div class="line"> //实体工厂A</div><div class="line">public class bmwFactory implements Icarfactory&#123;</div><div class="line">          public Icar createCar()&#123;</div><div class="line">                   return new bwm();</div><div class="line">          &#125;</div><div class="line">&#125; </div><div class="line"> //实体工厂B</div><div class="line">public class buickFactory implements Icarfactory&#123;</div><div class="line">          public Icar createCar()&#123;</div><div class="line">                   return new buick();</div><div class="line">          &#125;</div><div class="line">&#125; </div><div class="line">//客户端测试</div><div class="line">public class test&#123;</div><div class="line">      public static void main(String []args)&#123;</div><div class="line">           Icarfactory factory=new bmwFactory();</div><div class="line">           Icar bwm= factory.createCar(); </div><div class="line">           bwm.docar();</div><div class="line"> </div><div class="line">           factory=new buickFactory();</div><div class="line">           Icar buick= factory.createCar(); </div><div class="line">           buick.docar();</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<h2 id="抽象工厂"><a href="#抽象工厂" class="headerlink" title="抽象工厂"></a>抽象工厂</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div></pre></td><td class="code"><pre><div class="line">//抽象产品（Bmw和Audi同理）  </div><div class="line">abstract class BenzCar&#123;  </div><div class="line">    private String name;  </div><div class="line">      </div><div class="line">    public abstract void drive();  </div><div class="line">      </div><div class="line">    public String getName() &#123;  </div><div class="line">        return name;  </div><div class="line">    &#125;  </div><div class="line">    public void setName(String name) &#123;  </div><div class="line">        this.name = name;  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">//具体产品（Bmw和Audi同理）  </div><div class="line">class BenzSportCar extends BenzCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----BenzSportCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class BenzBusinessCar extends BenzCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----BenzBusinessCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">abstract class BmwCar&#123;  </div><div class="line">    private String name;  </div><div class="line">      </div><div class="line">    public abstract void drive();  </div><div class="line">      </div><div class="line">    public String getName() &#123;  </div><div class="line">        return name;  </div><div class="line">    &#125;  </div><div class="line">    public void setName(String name) &#123;  </div><div class="line">        this.name = name;  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class BmwSportCar extends BmwCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----BmwSportCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class BmwBusinessCar extends BmwCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----BmwBusinessCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">abstract class AudiCar&#123;  </div><div class="line">    private String name;  </div><div class="line">      </div><div class="line">    public abstract void drive();  </div><div class="line">      </div><div class="line">    public String getName() &#123;  </div><div class="line">        return name;  </div><div class="line">    &#125;  </div><div class="line">    public void setName(String name) &#123;  </div><div class="line">        this.name = name;  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class AudiSportCar extends AudiCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----AudiSportCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class AudiBusinessCar extends AudiCar&#123;  </div><div class="line">    public void drive()&#123;  </div><div class="line">        System.out.println(this.getName()+&quot;----AudiBusinessCar-----------------------&quot;);  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">  </div><div class="line">//抽象工厂  </div><div class="line">abstract class Driver3&#123;  </div><div class="line">    public abstract BenzCar createBenzCar(String car) throws Exception;  </div><div class="line">      </div><div class="line">    public abstract BmwCar createBmwCar(String car) throws Exception;  </div><div class="line">      </div><div class="line">    public abstract AudiCar createAudiCar(String car) throws Exception;  </div><div class="line">&#125;  </div><div class="line">//具体工厂  </div><div class="line">class SportDriver extends Driver3&#123;  </div><div class="line">    public BenzCar createBenzCar(String car) throws Exception &#123;  </div><div class="line">        return new BenzSportCar();  </div><div class="line">    &#125;  </div><div class="line">    public BmwCar createBmwCar(String car) throws Exception &#123;  </div><div class="line">        return new BmwSportCar();  </div><div class="line">    &#125;  </div><div class="line">    public AudiCar createAudiCar(String car) throws Exception &#123;  </div><div class="line">        return new AudiSportCar();  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">class BusinessDriver extends Driver3&#123;  </div><div class="line">    public BenzCar createBenzCar(String car) throws Exception &#123;  </div><div class="line">        return new BenzBusinessCar();  </div><div class="line">    &#125;  </div><div class="line">    public BmwCar createBmwCar(String car) throws Exception &#123;  </div><div class="line">        return new BmwBusinessCar();  </div><div class="line">    &#125;  </div><div class="line">    public AudiCar createAudiCar(String car) throws Exception &#123;  </div><div class="line">        return new AudiBusinessCar();  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//老板  </div><div class="line">public class BossAbstractFactory &#123;  </div><div class="line">  </div><div class="line">    public static void main(String[] args) throws Exception &#123;  </div><div class="line">          </div><div class="line">        Driver3 d = new BusinessDriver();  </div><div class="line">        AudiCar car = d.createAudiCar(&quot;&quot;);  </div><div class="line">        car.drive();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>简单工厂（静态工厂方法）：根绝不同的方法参数，创建不同的产品，所以如果增加一种新产品，必须要修改工厂类中的工厂方法，多一种if(),这样实际违背了开闭设计原则。</p>
+<p>工厂方法模式：根据不同的工厂类，创建不同的产品，这样如果需要增加同一种产品，不需要修改工厂方法，只要增加产品</p>
+<p>抽象方法：产品有两个维度，比如多个产品族，每个产品族下面有不通的产品，比如奔驰车，宝马车是不通的产品族，每个产品族下面还有奔驰跑车，奔驰轿车，奔驰suv等。根据不同的工厂类（决定产品族）和其中不同的工厂方法（决定产品类型），创建不同的产品。如果增加一个产品族，只需要增加一个具体的工厂就可以了，但是如果增加具体的产品类型，就不行了，需要修改所有工厂类，在其中增加方法。</p>
+<p>简而言之，从类和方法两个维度决定了产品的生产。</p>
+<p>以上三种，分别从参数、类、类+方法（其实变数也只有类，方法不可变)进行产品变化，但是没有根据方进行产品的变化，因为这是违反开闭原则的。</p>
+<h2 id="工厂方法和抽象工厂"><a href="#工厂方法和抽象工厂" class="headerlink" title="工厂方法和抽象工厂"></a>工厂方法和抽象工厂</h2><p>不讨论简单工厂，因为简单工厂是一种特殊的工厂给方法模式，包含在工厂方法里面。</p>
+<p>两者目的都是要符合开闭原则（简单工厂模式不符合开闭原则），但是工厂方法模式增加一个工厂类，只能增加一种产品，而抽象工厂可以增加一族产品。这个也是他们在选用时候的依据。</p>
+<h2 id="如何选择？"><a href="#如何选择？" class="headerlink" title="如何选择？"></a>如何选择？</h2><p>简单工厂 ： 用来生产同一等级结构中的任意产品。（对于增加新的产品，无能为力）</p>
+<p>工厂方法 ：用来生产同一等级结构中的固定产品。（支持增加任意产品）   </p>
+<p>抽象工厂 ：用来生产不同产品族的全部产品。（对于增加新的产品，无能为力；支持增加产品族）  </p>
+<h2 id="andrroid中的工厂模式"><a href="#andrroid中的工厂模式" class="headerlink" title="andrroid中的工厂模式"></a>andrroid中的工厂模式</h2><p>1.BitmapFactory<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">BufferedInputStream in = new BufferedInputStream(</div><div class="line">		new FileInputStream(new File(path)));</div><div class="line">	BitmapFactory.Options options = new BitmapFactory.Options();</div><div class="line">	options.inJustDecodeBounds = false;</div><div class="line">	options.inSampleSize = 2;//宽和高变为原来的1/2，即图片压缩为原来的1/4</div><div class="line">	Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);</div></pre></td></tr></table></figure></p>
+<h2 id="工厂模式的优点"><a href="#工厂模式的优点" class="headerlink" title="工厂模式的优点"></a>工厂模式的优点</h2><p>1.如果类的构造函数发生变化，所有new的地方都要改，而工厂模式，只需要修改工厂方法就可以了。</p>
+<p>2.面向接口，解耦，client不需要关心产品的具体生产过程。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">设计模式</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/工厂模式/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-单例模式" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/单例模式/">单例模式</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/单例模式/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:52:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>建造型设计模式</p>
+</blockquote>
+<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class SingleObject&#123;</div><div class="line">    private static SingleObject instance;</div><div class="line">    private SingleObject()&#123;&#125;;</div><div class="line">    public static SingleObject getInstance() &#123;</div><div class="line">        if(instance == null) &#123;</div><div class="line">            instance = new SingleObject();        </div><div class="line">        &#125;    </div><div class="line">        return instance;</div><div class="line">    &#125;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="懒汉式，线程安全"><a href="#懒汉式，线程安全" class="headerlink" title="懒汉式，线程安全"></a>懒汉式，线程安全</h2><p>优点：第一次使用才初始化，避免内存浪费</p>
+<p>缺点：加锁影响效率<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class SingleObject&#123;</div><div class="line">    private static SingleObject instance;</div><div class="line">    private SingleObject()&#123;&#125;;</div><div class="line">    public static synchronized SingleObject getInstance() &#123;</div><div class="line">        if(instance == null) &#123;</div><div class="line">            instance = new SingleObject();        </div><div class="line">        &#125;    </div><div class="line">        return instance;</div><div class="line">    &#125;    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><p>优点：线程安全，因为没有加锁，效率较高。</p>
+<p>缺点：类加载时就初始化，浪费内存。</p>
+<p>它基于 classloder 机制避免了多线程的同步问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class Singleton &#123;  </div><div class="line">    private static Singleton instance = new Singleton();  </div><div class="line">    private Singleton ()&#123;&#125;  </div><div class="line">    public static Singleton getInstance() &#123;  </div><div class="line">    return instance;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="饿汉式，双检锁-双重校验锁（DCL，即-double-checked-locking）"><a href="#饿汉式，双检锁-双重校验锁（DCL，即-double-checked-locking）" class="headerlink" title="饿汉式，双检锁/双重校验锁（DCL，即 double-checked locking）"></a>饿汉式，双检锁/双重校验锁（DCL，即 double-checked locking）</h2><p>懒加载，线程安全。</p>
+<p>安全且在多线程情况下能保持高性能<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class SingleObject&#123;</div><div class="line">    private static volatil SingleObject instance;</div><div class="line">    private SingleObject()&#123;&#125;</div><div class="line">    public static SingleObject getInstance() &#123;</div><div class="line">        if(instance == null) &#123;</div><div class="line">            synchronized(SingleObject.class) &#123;</div><div class="line">                if(instance == null) &#123;</div><div class="line">                    instance = new SingleObject();                </div><div class="line">                &#125;            </div><div class="line">            &#125;        </div><div class="line">        &#125;    </div><div class="line">        return instance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Android中的应用"><a href="#Android中的应用" class="headerlink" title="Android中的应用"></a>Android中的应用</h3><p>1.Android-Universal-Image-Loader<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private volatile static ImageLoader instance;</div><div class="line">/** Returns singleton class instance */</div><div class="line">public static ImageLoader getInstance() &#123;</div><div class="line">    if (instance == null) &#123;</div><div class="line">        synchronized (ImageLoader.class) &#123;</div><div class="line">            if (instance == null) &#123;</div><div class="line">                instance = new ImageLoader();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return instance;</div></pre></td></tr></table></figure></p>
+<p>2.EventBus<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private static volatile EventBus defaultInstance;</div><div class="line">public static EventBus getDefault() &#123;</div><div class="line">    if (defaultInstance == null) &#123;</div><div class="line">        synchronized (EventBus.class) &#123;</div><div class="line">            if (defaultInstance == null) &#123;</div><div class="line">                defaultInstance = new EventBus();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return defaultInstance;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="登记式-静态内部类"><a href="#登记式-静态内部类" class="headerlink" title="登记式/静态内部类"></a>登记式/静态内部类</h2><p>懒加载，线程安全.</p>
+<p>这种方式能达到双检锁方式一样的功效，但实现更简单。对静态域使用延迟初始化，应使用这种方式而不是双检锁方式。这种方式只适用于静态域的情况，双检锁方式可在实例域需要延迟初始化时使用。</p>
+<p>这种方式同样利用了 classloder 机制来保证初始化 instance 时只有一个线程，它跟第 3 种方式不同的是：第 3 种方式只要 Singleton 类被装载了，那么 instance 就会被实例化（没有达到 lazy loading 效果），而这种方式是 Singleton 类被装载了，instance 不一定被初始化。因为 SingletonHolder 类没有被主动使用，只有显示通过调用 getInstance 方法时，才会显示装载 SingletonHolder 类，从而实例化 instance。想象一下，如果实例化 instance 很消耗资源，所以想让它延迟加载，另外一方面，又不希望在 Singleton 类加载时就实例化，因为不能确保 Singleton 类还可能在其他的地方被主动使用从而被加载，那么这个时候实例化 instance 显然是不合适的。这个时候，这种方式相比第 3 种方式就显得很合理。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class SingleObject &#123;</div><div class="line">    private static class InstanceHolder&#123;</div><div class="line">           private static final SingleObject instance = new SingleObject(); </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private SingleObject() &#123;&#125;</div><div class="line"></div><div class="line">    public static final SingleObject getInstance() &#123;</div><div class="line">        return InstanceHolder.instance;    </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="枚举式"><a href="#枚举式" class="headerlink" title="枚举式"></a>枚举式</h2><p>JDK1.5 起，不是懒加载，线程安全。</p>
+<p>是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public enum SingleInstance&#123;</div><div class="line">    INSTANCE;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="方案选择"><a href="#方案选择" class="headerlink" title="方案选择"></a>方案选择</h2><p>一般情况下，不建议使用第 1 种和第 2 种懒汉方式，建议使用第 3 种饿汉方式。只有在要明确实现 lazy loading 效果时，才会使用第 5 种登记方式。如果涉及到反序列化创建对象时，可以尝试使用第 6 种枚举方式。如果有其他特殊的需求，可以考虑使用第 4 种双检锁方式。</p>
+<h2 id="android中的应用"><a href="#android中的应用" class="headerlink" title="android中的应用"></a>android中的应用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">static InputMethodManager sInstance;</div><div class="line">public static InputMethodManager getInstance() &#123;</div><div class="line">    synchronized (InputMethodManager.class) &#123;</div><div class="line">        if (sInstance == null) &#123;</div><div class="line">            IBinder b = ServiceManager.getService(Context.INPUT_METHOD_SERVICE);</div><div class="line">            IInputMethodManager service = IInputMethodManager.Stub.asInterface(b);</div><div class="line">            sInstance = new InputMethodManager(service, Looper.getMainLooper());</div><div class="line">        &#125;</div><div class="line">        return sInstance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">设计模式</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/单例模式/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-面向对象6大设计原则（简明扼要）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/面向对象6大设计原则（简明扼要）/">面向对象6大设计原则（简明扼要）</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/面向对象6大设计原则（简明扼要）/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:51:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="单一职责"><a href="#单一职责" class="headerlink" title="单一职责"></a>单一职责</h2><p>就是将一组相关性很高的函数、数据封装到一个类中。换句话说，一个类应该有职责单一。</p>
+<h2 id="里式替换"><a href="#里式替换" class="headerlink" title="里式替换"></a>里式替换</h2><p>继承与多态。</p>
+<p>所有引用基类的地方必须能透明地使用其子类对象。定义看起来很抽象，其实，很容易理解，本质上就是说，要好好利用继承和多态。简单地说，就是以父类的形式声明的变量（或形参），赋值为任何继承于这个父类的子类后不影响程序的执行。</p>
+<h2 id="依赖倒置"><a href="#依赖倒置" class="headerlink" title="依赖倒置"></a>依赖倒置</h2><p>主要是实现解耦，使得高层次的模块不依赖于低层次模块的具体实现细节。</p>
+<p>（1）高层模块不应该依赖底层模块（具体实现），二者都应该依赖其抽象（抽象类或接口）</p>
+<p>（2）抽象不应该依赖细节（废话，抽象类跟接口肯定不依赖具体的实现了）</p>
+<p>（3）细节应该依赖于抽象（同样废话，具体实现类肯定要依赖其继承的抽象类或接口）</p>
+<h2 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h2><p>高内聚，低耦合。</p>
+<h2 id="开闭原则"><a href="#开闭原则" class="headerlink" title="开闭原则"></a>开闭原则</h2><p>对扩展开放，对修改关闭。</p>
+<h2 id="接口隔离"><a href="#接口隔离" class="headerlink" title="接口隔离"></a>接口隔离</h2><p>类之间的依赖关系应该建立在最小的接口上。其原则是将非常庞大的、臃肿的接口拆分成更小的更具体的接口。</p>
+<p>建立单一接口，不要建立庞大臃肿的接口，尽量细化接口，接口中的方法尽量少。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.uml.org.cn/sjms/201211023.asp" target="_blank" rel="external">设计模式六大原则</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">设计模式</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/面向对象6大设计原则（简明扼要）/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-android的内存优化" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -803,269 +1078,6 @@
 
 
   
-    <article id="post-Retrofit使用示例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/26/Retrofit使用示例/">Retrofit使用示例</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/26/Retrofit使用示例/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:19:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">NetworkInterface</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">//baseUrl = "http://localhost:4567/"</span></div><div class="line"></div><div class="line">    <span class="comment">//GET表示请求方法.值为path，也可以不设置值，用@url代替</span></div><div class="line">    <span class="comment">// id如果为1，完整的url就是http://localhost:4567/blog/1</span></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"blog/&#123;id&#125;"</span>)</div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">getBlog</span><span class="params">(@Path(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id)</span>;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 相比getBlog接口，<span class="doctag">@GET</span>中并没有指定path,直接将传入参数url当做path,方法是参数加上<span class="doctag">@Url</span>注解</span></div><div class="line"><span class="comment">     * <span class="doctag">@param</span> url</span></div><div class="line"><span class="comment">     * <span class="doctag">@return</span></span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">getBlog2</span><span class="params">(@Url String url)</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">// @http注解的方式</span></div><div class="line">    <span class="comment">// @Path("id")注解指定这个参数用于替换path中的&#123;id&#125;占位符</span></div><div class="line">    <span class="meta">@HTTP</span>(method = <span class="string">"GET"</span>, path = <span class="string">"blog/&#123;id&#125;"</span>, hasBody = <span class="keyword">false</span>)</div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">getBlog3</span><span class="params">(@Path(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id)</span>;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * <span class="doctag">@ForUrlEncoded</span>表示这个post请求是个表单提交</span></div><div class="line"><span class="comment">     * <span class="doctag">@Field</span>注解表示这个参数是表单的提交参数</span></div><div class="line"><span class="comment">     * 表单的参数一般都是放在请求的body中，而不是像get请求那样放在url后面</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"/form"</span>)</div><div class="line">    <span class="meta">@FormUrlEncoded</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testFormUrl</span><span class="params">(@Field(<span class="string">"username"</span>)</span> String username, @<span class="title">Field</span><span class="params">(<span class="string">"age"</span>)</span> <span class="keyword">int</span> age)</span>;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"/form"</span>)</div><div class="line">    <span class="meta">@FormUrlEncoded</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testFormUrl</span><span class="params">(@FieldMap Map&lt;String, Integer&gt; param)</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     *<span class="doctag">@Multipart</span>:代文件上传的表单提交</span></div><div class="line"><span class="comment">     * <span class="doctag">@Part</span>注解和<span class="doctag">@Multipart</span>注解配合使用，主要用于文件上传的情况</span></div><div class="line"><span class="comment">     *</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"/form"</span>)</div><div class="line">    <span class="meta">@Multipart</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testFileUpload</span><span class="params">(@Part(<span class="string">"name"</span>)</span> RequestBody name, @<span class="title">Part</span><span class="params">(<span class="string">"age"</span>)</span> RequestBody age, @Part MultipartBody.Part file)</span>;</div><div class="line"></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"/form"</span>)</div><div class="line">    <span class="meta">@Multipart</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testFileUpload</span><span class="params">(@PartMap Map&lt;String,RequestBody&gt; args, @ Part MultipartBody.Part file)</span></span>;</div><div class="line"></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"/form"</span>)</div><div class="line">    <span class="meta">@Multipart</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testFileUpload</span><span class="params">(@PartMap Map&lt;String, RequestBody&gt; args)</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     *<span class="doctag">@headers</span>注解:用在方法上，添加自定义请求头</span></div><div class="line"><span class="comment">     * <span class="doctag">@header</span>注解:用于参数上，添加自定义请求头</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"headers?showAll=true"</span>)</div><div class="line">    <span class="meta">@Headers</span>(&#123;<span class="string">"customheader1:value1, customheader2:value2"</span>&#125;)</div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testHeaders</span><span class="params">(@Header(<span class="string">"customheader3"</span>)</span>  String customheaderValue)</span>;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     *<span class="doctag">@Url</span>注解：用在参数上，指定某个参数是url上的path，该path再加上baseUrl和参数，就是完整的url</span></div><div class="line"><span class="comment">     * <span class="doctag">@Query</span>注解：用在参数上，指定某个参数为url上的参数</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">testUrlQuery</span><span class="params">(@Url String url, @Query(<span class="string">"showAll"</span>)</span> <span class="keyword">boolean</span> needShow)</span>;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"blog/&#123;id&#125;"</span>)</div><div class="line">    Call&lt;Result&lt;Blog&gt;&gt; testGson(<span class="meta">@Path</span>(<span class="string">"id"</span>) <span class="keyword">int</span> id);</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     *<span class="doctag">@Body</span>注解：post请求的消息体内容</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="meta">@POST</span>(<span class="string">"blog"</span>)</div><div class="line">    Call&lt;Result&lt;Blog&gt;&gt; createBlog(<span class="meta">@Body</span> Blog blog);</div><div class="line"></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"blog/&#123;id&#125;"</span>)</div><div class="line">    <span class="function">Call&lt;String&gt; <span class="title">getBlog2</span><span class="params">(@Path(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id)</span>;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div><div class="line">339</div><div class="line">340</div><div class="line">341</div><div class="line">342</div><div class="line">343</div><div class="line">344</div><div class="line">345</div><div class="line">346</div><div class="line">347</div><div class="line">348</div><div class="line">349</div><div class="line">350</div><div class="line">351</div><div class="line">352</div><div class="line">353</div><div class="line">354</div><div class="line">355</div><div class="line">356</div><div class="line">357</div><div class="line">358</div><div class="line">359</div><div class="line">360</div><div class="line">361</div><div class="line">362</div><div class="line">363</div><div class="line">364</div><div class="line">365</div><div class="line">366</div><div class="line">367</div><div class="line">368</div><div class="line">369</div><div class="line">370</div><div class="line">371</div><div class="line">372</div><div class="line">373</div><div class="line">374</div><div class="line">375</div><div class="line">376</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySample</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String mUrl = <span class="string">"http://127.0.0.1:4567/"</span>; <span class="comment">//本地ip：端口号</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Retrofit mRetrofit;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Retrofit mGsonRetrofit;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> NetworkInterface mGsonAPI;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> NetworkInterface mAPI;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Gson mGson;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(String tag , Response&lt;ResponseBody&gt; response, Request request)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"---------------"</span>+tag+<span class="string">"----------------------"</span>);</div><div class="line">        printRequest(request);</div><div class="line">        printResponse(response);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print2</span><span class="params">(String tag, Response&lt;Result&lt;Blog&gt;&gt; response, Request request)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"---------------"</span>+tag+<span class="string">"----------------------"</span>);</div><div class="line">        printRequest(request);</div><div class="line">        printResponse2(response);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printResponse</span><span class="params">(Response&lt;ResponseBody&gt; response)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"responseBody:"</span>+response.body().string());</div><div class="line">        System.out.println(<span class="string">"responseHeaders:\n"</span>+response.headers().toString());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printResponse2</span><span class="params">(Response&lt;Result&lt;Blog&gt;&gt; response)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"responseBody:"</span>+response.body().toString());</div><div class="line">        System.out.println(<span class="string">"responseHeaders:\n"</span>+response.headers().toString());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printRequest</span><span class="params">(Request request)</span> </span>&#123;</div><div class="line">        RequestBody requestBody = request.body();</div><div class="line">        Headers requestHeaders = request.headers();</div><div class="line">        HttpUrl requestUrl = request.url();</div><div class="line">        System.out.println(<span class="string">"request url:"</span>+requestUrl.toString());</div><div class="line">        <span class="keyword">if</span>(requestBody == <span class="keyword">null</span>) &#123;</div><div class="line">            System.out.println(<span class="string">"没有requestBody"</span>);</div><div class="line">        &#125;<span class="keyword">else</span> &#123;</div><div class="line">            System.out.println(<span class="string">"requestBody:"</span>+requestBody.toString());</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">int</span> size = requestHeaders.size();</div><div class="line">        System.out.println(<span class="string">"requeset headers size="</span>+size);</div><div class="line">        System.out.println(<span class="string">"requestHeaders:\n"</span>+requestHeaders.toString());</div><div class="line"></div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        mRetrofit = <span class="keyword">new</span> Retrofit.Builder().baseUrl(mUrl).build();</div><div class="line">        mAPI = mRetrofit.create(NetworkInterface.class);</div><div class="line"></div><div class="line"></div><div class="line">        mGson =  <span class="keyword">new</span> GsonBuilder().setDateFormat(<span class="string">"yyyy-MM-dd hh:mm:ss"</span>).create();</div><div class="line">        mGsonRetrofit = <span class="keyword">new</span> Retrofit.Builder().baseUrl(mUrl).addConverterFactory(GsonConverterFactory.create(mGson)).build();</div><div class="line">        mGsonAPI = mGsonRetrofit.create(NetworkInterface.class);</div><div class="line"></div><div class="line">        test1();</div><div class="line"></div><div class="line">        test2();</div><div class="line"></div><div class="line">        test3();</div><div class="line"></div><div class="line">        test4();</div><div class="line"></div><div class="line">        test5();</div><div class="line"></div><div class="line">        test6();</div><div class="line"></div><div class="line">        test7();</div><div class="line"></div><div class="line">        test8();</div><div class="line"></div><div class="line">        test9();</div><div class="line"></div><div class="line">        test10();</div><div class="line"></div><div class="line">        test11();</div><div class="line"></div><div class="line">        test12();</div><div class="line"></div><div class="line">        test13();</div><div class="line"></div><div class="line">        test14();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 根据id获取数据，同步方式</span></div><div class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> id = <span class="number">1</span>;</div><div class="line"></div><div class="line">        <span class="comment">//构建call，相当于request</span></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.getBlog(id);</div><div class="line"></div><div class="line">        <span class="comment">// 同步请求，Response是retrofit的类，ResponseBody是okhttp中的</span></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line"></div><div class="line">        print(<span class="string">"test7"</span>,response, call.request());</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 根据id获取数据，异步方式</span></div><div class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> id = <span class="number">1</span>;</div><div class="line"></div><div class="line"></div><div class="line">        <span class="comment">// 构建call</span></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.getBlog(id);</div><div class="line"></div><div class="line">        call.enqueue(<span class="keyword">new</span> Callback&lt;ResponseBody&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call&lt;ResponseBody&gt; call, Response&lt;ResponseBody&gt; response)</span> </span>&#123;</div><div class="line">                ResponseBody body = response.body();</div><div class="line">                Headers headers = response.headers();</div><div class="line"></div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    print(<span class="string">"test2"</span>,response, call.request());</div><div class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call&lt;ResponseBody&gt; call, Throwable t)</span> </span>&#123;</div><div class="line">                System.out.println(<span class="string">"test2 onFailure t="</span>+t);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 相比test1所用的接口，<span class="doctag">@GET</span>中并没有指定</span></div><div class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line"></div><div class="line">        String path = <span class="string">"blog/1"</span>;</div><div class="line">        <span class="comment">//构建call，相当于request</span></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.getBlog2(path);</div><div class="line"></div><div class="line">        <span class="comment">// 同步请求，Response是retrofit的类，ResponseBody是okhttp中的</span></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line"></div><div class="line">        print(<span class="string">"test3"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">int</span> id = <span class="number">2</span>;</div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.getBlog3(id);</div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line"></div><div class="line">        print(<span class="string">"test4"</span>,response, call.request());</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test5</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line"></div><div class="line">        String name = <span class="string">"jack"</span>;</div><div class="line">        <span class="keyword">int</span> age = <span class="number">22</span>;</div><div class="line"></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testFormUrl(name,age);</div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line"></div><div class="line">        print(<span class="string">"test5"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test6</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        String name = <span class="string">"yangyang"</span>;</div><div class="line">        <span class="keyword">int</span> age = <span class="number">25</span>;</div><div class="line"></div><div class="line">        Map&lt;String,Integer&gt; param = <span class="keyword">new</span> HashMap&lt;String,Integer&gt;();</div><div class="line">        param.put(name, age);</div><div class="line"></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testFormUrl(param);</div><div class="line"></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line"></div><div class="line">        print(<span class="string">"test6"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test7</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        MediaType textType = MediaType.parse(<span class="string">"text/plain"</span>);</div><div class="line">        RequestBody name = RequestBody.create(textType,<span class="string">"jjjjjj"</span>);</div><div class="line">        RequestBody age = RequestBody.create(textType,<span class="string">"32"</span>);</div><div class="line">        RequestBody file = RequestBody.create(MediaType.parse(<span class="string">"application/octet-stream"</span>),<span class="string">"这里是模拟文件的内容"</span>);</div><div class="line"></div><div class="line">        MultipartBody.Part filePart = MultipartBody.Part.createFormData(<span class="string">"file"</span>,<span class="string">"test.txt7"</span>,file);</div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testFileUpload(name, age, filePart);</div><div class="line"></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line">        print(<span class="string">"test7"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test8</span><span class="params">()</span> <span class="keyword">throws</span>  IOException </span>&#123;</div><div class="line">        MediaType textType = MediaType.parse(<span class="string">"text/plain"</span>);</div><div class="line">        RequestBody name = RequestBody.create(textType,<span class="string">"TEST8"</span>);</div><div class="line">        RequestBody age = RequestBody.create(textType,<span class="string">"30"</span>);</div><div class="line"></div><div class="line">        Map&lt;String,RequestBody&gt; args = <span class="keyword">new</span> HashMap&lt;String, RequestBody&gt;();</div><div class="line">        args.put(<span class="string">"name"</span>,name);</div><div class="line">        args.put(<span class="string">"age"</span>,age);</div><div class="line"></div><div class="line">        RequestBody file = RequestBody.create(MediaType.parse(<span class="string">"application/octet-stream"</span>),<span class="string">"这里是模拟文件的内容2222"</span>);</div><div class="line">        MultipartBody.Part filePart = MultipartBody.Part.createFormData(<span class="string">"file"</span>,<span class="string">"test8.txt"</span>,file);</div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testFileUpload(args, filePart);</div><div class="line"></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line">        print(<span class="string">"test8"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test9</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        MediaType textType = MediaType.parse(<span class="string">"text/plain"</span>);</div><div class="line">        RequestBody name = RequestBody.create(textType,<span class="string">"TEST9"</span>);</div><div class="line">        RequestBody age = RequestBody.create(textType,<span class="string">"30"</span>);</div><div class="line"></div><div class="line"></div><div class="line">        Map&lt;String,RequestBody&gt; args = <span class="keyword">new</span> HashMap&lt;String, RequestBody&gt;();</div><div class="line">        args.put(<span class="string">"name"</span>,name);</div><div class="line">        args.put(<span class="string">"age"</span>,age);</div><div class="line">        RequestBody file = RequestBody.create(MediaType.parse(<span class="string">"application/octet-stream"</span>),<span class="string">"这里是模拟文件的内容3333"</span>);</div><div class="line"></div><div class="line">        args.put(<span class="string">"file\"; filename=\"test9.txt"</span>,file);</div><div class="line"></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testFileUpload(args);</div><div class="line"></div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line">        print(<span class="string">"test9"</span>,response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 增加自定义的request header</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test10</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testHeaders(<span class="string">"value3"</span>);</div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line">        print(<span class="string">"test10"</span>, response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test11</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        Call&lt;ResponseBody&gt; call = mAPI.testUrlQuery(<span class="string">"headers"</span>,<span class="keyword">true</span>);</div><div class="line">        Response&lt;ResponseBody&gt; response = call.execute();</div><div class="line">        print(<span class="string">"test11"</span>, response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test12</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        Gson gson =  <span class="keyword">new</span> GsonBuilder().setDateFormat(<span class="string">"yyyy-MM-dd hh:mm:ss"</span>).create();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> id = <span class="number">1</span>;</div><div class="line">        Call&lt;Result&lt;Blog&gt;&gt; call = mGsonAPI.testGson(id);</div><div class="line"></div><div class="line">        Response&lt;Result&lt;Blog&gt;&gt; response = call.execute();</div><div class="line"></div><div class="line">        print2(<span class="string">"test12"</span>, response, call.request());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">   <span class="comment">/**</span></div><div class="line"><span class="comment">     * 直接提交bean数据</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test13</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        Blog blog = <span class="keyword">new</span> Blog();</div><div class="line">        blog.author = <span class="string">"maxw"</span>;</div><div class="line">        blog.content = <span class="string">"new blog"</span>;</div><div class="line">        blog.date = <span class="string">"8月18日"</span>;</div><div class="line">        blog.id = <span class="number">666</span>;</div><div class="line">        blog.title = <span class="string">"wtf"</span>;</div><div class="line"></div><div class="line">        Call&lt;Result&lt;Blog&gt;&gt; call = mGsonAPI.createBlog(blog);</div><div class="line">        Response&lt;Result&lt;Blog&gt;&gt; response = call.execute();</div><div class="line"></div><div class="line">        print2(<span class="string">"test13"</span>,response,call.request());</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 结合rxjava</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test14</span><span class="params">()</span></span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 自定义convert实例</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test15</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder().baseUrl(mUrl).addConverterFactory(StringConvertFactory.create()).build();</div><div class="line">        NetworkInterface api = retrofit.create(NetworkInterface.class);</div><div class="line"></div><div class="line">        Call&lt;String&gt; call = api.getBlog2(<span class="number">1</span>);</div><div class="line">        Response&lt;String&gt; response = call.execute();</div><div class="line"></div><div class="line">        String body =response.body();</div><div class="line">        System.out.println(<span class="string">"-------------------test15--------------------"</span>);</div><div class="line">        System.out.println(<span class="string">"body="</span>+body);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 自定义adapter实例</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test16</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 自定义convert,将返回的responseBody（默认），转换成自己想要的bean类型</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">StringConvert</span> <span class="keyword">implements</span> <span class="title">Converter</span>&lt;<span class="title">ResponseBody</span> , <span class="title">String</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> StringConvert sInstance = <span class="keyword">new</span> StringConvert();</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="title">StringConvert</span><span class="params">()</span></span>&#123;&#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">convert</span><span class="params">(ResponseBody body)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">            <span class="keyword">return</span> body.string();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">StringConvertFactory</span> <span class="keyword">extends</span> <span class="title">Converter</span>.<span class="title">Factory</span> </span>&#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> StringConvertFactory sInstance = <span class="keyword">new</span> StringConvertFactory();</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="title">StringConvertFactory</span><span class="params">()</span> </span>&#123;&#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> StringConvertFactory <span class="title">create</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> sInstance;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="keyword">public</span> Converter&lt;ResponseBody, ?&gt; responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) &#123;</div><div class="line">            <span class="keyword">if</span>(type == StringConvert.class) &#123;</div><div class="line">                <span class="keyword">return</span> StringConvert.sInstance;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.responseBodyConverter(type, annotations, retrofit);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> code;</div><div class="line">    <span class="keyword">public</span> String msg;</div><div class="line">    <span class="keyword">public</span> T data;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">long</span> count;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">long</span> page;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Result&#123;"</span> +</div><div class="line">                <span class="string">"code="</span> + code +</div><div class="line">                <span class="string">", msg='"</span> + msg + <span class="string">'\''</span> +</div><div class="line">                <span class="string">", data="</span> + data +</div><div class="line">                <span class="string">", count="</span> + count +</div><div class="line">                <span class="string">", page="</span> + page +</div><div class="line">                <span class="string">'&#125;'</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Blog</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@SerializedName</span>(<span class="string">"id"</span>)</div><div class="line">    <span class="keyword">public</span> <span class="keyword">long</span> id;</div><div class="line"></div><div class="line">    <span class="meta">@SerializedName</span>(<span class="string">"date"</span>)</div><div class="line">    <span class="keyword">public</span> String date;</div><div class="line"></div><div class="line">    <span class="meta">@SerializedName</span>(<span class="string">"author"</span>)</div><div class="line">    <span class="keyword">public</span> String author;</div><div class="line"></div><div class="line">    <span class="meta">@SerializedName</span>(<span class="string">"title"</span>)</div><div class="line">    <span class="keyword">public</span> String title;</div><div class="line"></div><div class="line">    <span class="meta">@SerializedName</span>(<span class="string">"content"</span>)</div><div class="line">    <span class="keyword">public</span> String content;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Blog&#123;"</span> +</div><div class="line">                <span class="string">"id="</span> + id +</div><div class="line">                <span class="string">", date='"</span> + date + <span class="string">'\''</span> +</div><div class="line">                <span class="string">", author='"</span> + author + <span class="string">'\''</span> +</div><div class="line">                <span class="string">", title='"</span> + title + <span class="string">'\''</span> +</div><div class="line">                <span class="string">", content='"</span> + content + <span class="string">'\''</span> +</div><div class="line">                <span class="string">'&#125;'</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">开源框架</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/26/Retrofit使用示例/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Volley源码阅读概述" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/26/Volley源码阅读概述/">Volley源码阅读概述</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/26/Volley源码阅读概述/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:17:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="RequestQueue"><a href="#RequestQueue" class="headerlink" title="RequestQueue"></a>RequestQueue</h2><p>RequestQueue有一个CacheDispatcher和若干个NetworkDispatcer，分别用mCacheDispatcher和mDispatcher成员变量表示，Dispatcher实际上就是一个thread，在这个thread的run方法中，通过while循环不停的queue中take出request，交给Network（实现类为BaseNetwork）进行处理（performRequest），在performRequest中，调用不同的HttpStack的performRequest方法进行最终的网络请求，这里才是真正处理网络交互的地方，不同的android版本使用的HttpStack实现是不同的，api9以下使用的是基于httpclient的httpclientstack，而9以上使用的是基于httpurlconnection的hurlstack。</p>
-<h2 id="Volley"><a href="#Volley" class="headerlink" title="Volley"></a>Volley</h2><p>volley的入口类，主要用于构建新的请求队列requestQueue，并为其制定所使用httpurlconnection。构建网络处理类Network，构建磁盘缓存Diskbasedcache等等。</p>
-<h2 id="DiskbasedCache"><a href="#DiskbasedCache" class="headerlink" title="DiskbasedCache"></a>DiskbasedCache</h2><p>缓存位置：new File(context.getCacheDir(),”volley”）<br>，即data/data/<package name="">/cache/volley文件夹。<br>缓存是以Entry的数据结构进行存储的，其主要成员是btye[] data。Entry的来源是response，networkdispatcher在处理response的之后，HttpHeaderParser会parseCacheHeader,得到这个Cache.Entry对象。<br>缓存的条件有两个：<br>1.rquest的shouldCache()返回true,这个可以通过setShouldCache(true)设置。<br>2.requeset的parseNetworkResponse()方法被重写的时候，返回值Response对象的cacheEntry对象不能为null，所以自定义request在重写这个方法的时候，最好通过HttpHeaderParser的parseCacheHeaders方法生成一个entry，并赋值给response对象。推荐这么写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//parsed是request解析后的结果，也就是网络请求的结果</div><div class="line">//success是Response类的静态方法</div><div class="line">//response是NetworkResponse类的对象，和Response类无关，不要搞成一个。</div><div class="line">Response.success(parsed,HttpHeaderParser.parseCacheHeaders(response));</div></pre></td></tr></table></figure></package></p>
-<p>一但确定需要缓存，NetworkDispatcher的成员变量DiskbasedCache就会通过put(key,value)将其缓存。<br>缓存除了将数据写入文件外，在DiskbasedCache中也会有一个LinkedHashMap进行内存的缓存。注意，entry的信息主要有两部分，一部分是头信息，另一部分是元数据，这里写入文件的是元数据，即entry.data,而写入内存LinkedHashMap的是entry的头信息。取缓存的时候，先从内存中找entry的头信息，找得到才会继续从文件里读元数据，找不到就不读了，返回null。将从文件中取到的data和从内存中取到的头信息再次拼成entry，这样就取到了缓存数据entry了。每个entry都存放在一个单独的文件中，文件名的起名有专门的规则，不细纠。<br>默认的磁盘缓存上限是5mb,当然可以调整的。</p>
-<h2 id="发送网络请求过程networkqueue-add-request"><a href="#发送网络请求过程networkqueue-add-request" class="headerlink" title="发送网络请求过程networkqueue.add(request)"></a>发送网络请求过程networkqueue.add(request)</h2><p>1.将request放入一个mCurrentRequest的set中</p>
-<p>2.判断request是否需要缓存，如果不需要，直接放入mNetworkQueue中。这个队列是被networkdispatcher使用的，networkdispatcher就是从这个队列中取出request进行处理的。</p>
-<p>3.request是否在waitingRequest中有同样类型的请求，如果不在，将其放入waitingRequest中，并且将其交给mCacheQueue，这个队列是给CacheDispather使用的。</p>
-<p>4.request在waitingRequest中是以map形式存放的，key是url+method，value是一个存放request的queue，也就是说，对同一种请求的多个请求存放在这个key-value中。<br>如果request在其中已经存在，说明之前有相同的请求了，这个是重复请求，将不会被发送。</p>
-<p>5.请求如果处理完毕，waitingRequest中的请求将被移除。</p>
-<h2 id="关于多线程"><a href="#关于多线程" class="headerlink" title="关于多线程"></a>关于多线程</h2><p>volley中有一个cachedispatcher，就是一个线程，有n个networkdispatcher，就是n个线程，默认n为4，也可以修改，但是就不能通过Volley.newRequestQueue()的api进行Requeue的初始化了，而是需要自己new一个RequestQueue，传递线程数量进去。</p>
-<h2 id="Networkdispatcher"><a href="#Networkdispatcher" class="headerlink" title="Networkdispatcher"></a>Networkdispatcher</h2><p>一个线程，从networkqueue中取出request进行处理，可以有多个。将request送入basenetowrk类进行网络请求，之后根据需要缓存请求和响应，最后交给ExecutorDeliver进行结果的分发处理。</p>
-<h2 id="CacheDispatcher"><a href="#CacheDispatcher" class="headerlink" title="CacheDispatcher"></a>CacheDispatcher</h2><p>一个线程，且只有一个，从cachequeue中取request进行处理，相比networkdispatcher而言，cachedispatcher会先尝试从本地取请求对应的响应，如果没取到或者响应过期了或者needrefresh了，才会将request丢进networkqueue中，等待networkdispatcher处理。如果取到了，将request和response交给ExecutorDeliver处理。</p>
-<h2 id="ExecutorDeliver"><a href="#ExecutorDeliver" class="headerlink" title="ExecutorDeliver"></a>ExecutorDeliver</h2><p>用来分发请求的响应结果的。<br>内含一个线程池，执行ResponseDeliverRunnable，在该runnable的run中，执行如下操作：</p>
-<p>1.将响应结果分发到对应的回调方法。</p>
-<p>2.request的finish</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">开源框架</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/26/Volley源码阅读概述/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-android的dex分包技术" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/26/android的dex分包技术/">android的dex分包技术</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/26/android的dex分包技术/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:12:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="android-dex分包方案"><a href="#android-dex分包方案" class="headerlink" title="android dex分包方案"></a>android dex分包方案</h2><p>原因：<br>1.一个dex文件最多只支持65526个方法<br>2.插件化，热修复的需要</p>
-<p>原理：<br>除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。</p>
-<h2 id="注入classloader"><a href="#注入classloader" class="headerlink" title="注入classloader"></a>注入classloader</h2><h3 id="PathClassLoader"><a href="#PathClassLoader" class="headerlink" title="PathClassLoader"></a>PathClassLoader</h3><p> Android uses this class for its system class loader and for its application class loader(s),<br> 加载android的系统类，以及应用类，但是只能加载系统apk的文件（即/data/app目录下）的apk文件。</p>
-<h3 id="DexClassLoader"><a href="#DexClassLoader" class="headerlink" title="DexClassLoader"></a>DexClassLoader</h3><p>加载apk，jar，dex等文件。可以用来执行非安装的程序代码。</p>
-<h3 id="BaseDexClassLoader"><a href="#BaseDexClassLoader" class="headerlink" title="BaseDexClassLoader"></a>BaseDexClassLoader</h3><p>是DexCalssLoader和PathClassLoade的父类，在该类中，寻找class的方法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Override  </div><div class="line">protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;  </div><div class="line">    List&lt;Throwable&gt; suppressedExceptions = new ArrayList&lt;Throwable&gt;();  </div><div class="line">    Class c = pathList.findClass(name, suppressedExceptions);  </div><div class="line">    if (c == null) &#123;  </div><div class="line">        ClassNotFoundException cnfe = new ClassNotFoundException(&quot;Didn&apos;t find class \&quot;&quot; + name + &quot;\&quot; on path: &quot; + pathList);  </div><div class="line">        for (Throwable t : suppressedExceptions) &#123;  </div><div class="line">            cnfe.addSuppressed(t);  </div><div class="line">       &#125;  </div><div class="line">        throw cnfe;  </div><div class="line">    &#125;  </div><div class="line">     return c;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>pathList.findClass()在DexPathList中的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Class findClass(String name, List&lt;Throwable&gt; suppressed) &#123;  </div><div class="line">    for (Element element : dexElements) &#123;  </div><div class="line">        DexFile dex = element.dexFile;  </div><div class="line">        if (dex != null) &#123;  </div><div class="line">            Class clazz = dex.loadClassBinaryName(name, definingContext, suppressed);  </div><div class="line">            if (clazz != null) &#123;  </div><div class="line">                return clazz;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">   &#125;  </div><div class="line">    if (dexElementsSuppressedExceptions != null) &#123;  </div><div class="line">        suppressed.addAll(Arrays.asList(dexElementsSuppressedExceptions));  </div><div class="line">    &#125;  </div><div class="line">    return null;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>加入我们将第二个dex中的class文件也放入dexelements数组中，那就应该可以加载第二个dex中的类了。</p>
-<p>在自定义的application的onCreate()中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">//参数libpath是第二个dex的文件信息，包含完整路径，在assets目录下。</div><div class="line">public String inject(String libPath) &#123;  </div><div class="line">    boolean hasBaseDexClassLoader = true;  </div><div class="line">    try &#123;  </div><div class="line">        Class.forName(&quot;dalvik.system.BaseDexClassLoader&quot;);  </div><div class="line">    &#125; catch (ClassNotFoundException e) &#123;  </div><div class="line">        hasBaseDexClassLoader = false;  </div><div class="line">    &#125;  </div><div class="line">    if (hasBaseDexClassLoader) &#123;  </div><div class="line">        PathClassLoader pathClassLoader = (PathClassLoader)sApplication.getClassLoader();  </div><div class="line">        DexClassLoader dexClassLoader = new DexClassLoader(libPath, sApplication.getDir(&quot;dex&quot;, 0).getAbsolutePath(), libPath, sApplication.getClassLoader());  </div><div class="line">        try &#123;  </div><div class="line">            Object dexElements = combineArray(getDexElements(getPathList(pathClassLoader)), getDexElements(getPathList(dexClassLoader)));  </div><div class="line">            Object pathList = getPathList(pathClassLoader);  </div><div class="line">            setField(pathList, pathList.getClass(), &quot;dexElements&quot;, dexElements);  </div><div class="line">            return &quot;SUCCESS&quot;;  </div><div class="line">        &#125; catch (Throwable e) &#123;  </div><div class="line">            e.printStackTrace();  </div><div class="line">            return android.util.Log.getStackTraceString(e);  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    return &quot;SUCCESS&quot;;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>将PathClassLoader中的elements和DexClassLoader中的elements合并，将合并后的elements注入到PathClassLoader中，就完成了。</p>
-<p>注意点：</p>
-<p>1.由于在application的onCreate中动态注入，所以第二个dex包不宜过大，否则会拖慢启动速度。</p>
-<p>2.由于低一点，一般将分包技术和插件技术结合使用，核心功能采用分包技术，非核心功能采用插件技术。</p>
-<p>3.如果不同的dex中有相同的class，则优先选择排在前面的dex中的class</p>
-<h2 id="阻止相关类打上CLASS-ISPREVERIFIED标志"><a href="#阻止相关类打上CLASS-ISPREVERIFIED标志" class="headerlink" title="阻止相关类打上CLASS_ISPREVERIFIED标志"></a>阻止相关类打上CLASS_ISPREVERIFIED标志</h2><h3 id="如何修改一个类的class文件"><a href="#如何修改一个类的class文件" class="headerlink" title="如何修改一个类的class文件"></a>如何修改一个类的class文件</h3><p>使用字节码处理工具javassist.</p>
-<p>提前准备的几个类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">package dodola.hackdex;</div><div class="line">public class AntilazyLoad</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class BugClass</div><div class="line">&#123;</div><div class="line">    public String bug()</div><div class="line">    &#123;</div><div class="line">        return &quot;bug class&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class LoadBugClass</div><div class="line">&#123;</div><div class="line">    public String getBugString()</div><div class="line">    &#123;</div><div class="line">        BugClass bugClass = new BugClass();</div><div class="line">        return bugClass.bug();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>插入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">package test;</div><div class="line"></div><div class="line">import javassist.ClassPool;</div><div class="line">import javassist.CtClass;</div><div class="line">import javassist.CtConstructor;</div><div class="line"></div><div class="line">public class InjectHack</div><div class="line">&#123;</div><div class="line">    public static void main(String[] args)</div><div class="line">    &#123;</div><div class="line">        try</div><div class="line">        &#123;</div><div class="line">            String path = &quot;/Users/zhy/develop_work/eclipse_android/imooc/JavassistTest/&quot;;</div><div class="line">            ClassPool classes = ClassPool.getDefault();</div><div class="line">            classes.appendClassPath(path + &quot;bin&quot;);//项目的bin目录即可</div><div class="line">            CtClass c = classes.get(&quot;dodola.hotfix.LoadBugClass&quot;);</div><div class="line">            CtConstructor ctConstructor = c.getConstructors()[0];</div><div class="line">            ctConstructor</div><div class="line">                    .insertAfter(&quot;System.out.println(dodola.hackdex.AntilazyLoad.class);&quot;);</div><div class="line">            c.writeFile(path + &quot;/output&quot;);</div><div class="line">        &#125; catch (Exception e)</div><div class="line">        &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="如何在dx之前去执行以上的操作"><a href="#如何在dx之前去执行以上的操作" class="headerlink" title="如何在dx之前去执行以上的操作"></a>如何在dx之前去执行以上的操作</h3><p>修改app/build_gradle<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">apply plugin: &apos;com.android.application&apos;</div><div class="line"></div><div class="line">task(&apos;processWithJavassist&apos;) &lt;&lt; &#123;</div><div class="line">    String classPath = file(&apos;build/intermediates/classes/debug&apos;)//项目编译class所在目录</div><div class="line">    dodola.patch.PatchClass.process(classPath, project(&apos;:hackdex&apos;).buildDir</div><div class="line">            .absolutePath + &apos;/intermediates/classes/debug&apos;)//第二个参数是hackdex的class所在目录</div><div class="line"></div><div class="line">&#125;</div><div class="line">android &#123;</div><div class="line">    applicationVariants.all &#123; variant -&gt;</div><div class="line">        variant.dex.dependsOn &lt;&lt; processWithJavassist //在执行dx命令之前将代码打入到class中</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="将class文件打包成独立的jar包"><a href="#将class文件打包成独立的jar包" class="headerlink" title="将class文件打包成独立的jar包"></a>将class文件打包成独立的jar包</h3><p>注意不是普通的jar包，是要经过dx工具转换的jar包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jar cvf hack.jar dodola/hackdex/*</div><div class="line">dx  --dex --output hack_dex.jar hack.jar</div></pre></td></tr></table></figure></p>
-<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>1.动态加载多个dex中的类</p>
-<p>2.由于dex中有可能有相同的类，此时，先加载的dex中的那个类生效。</p>
-<p>3.因为第2点，只要将修复问题的那个类放在一个dex中，并奖这个dex放在最先加载，即可修复那个有问题的类</p>
-<p>4.CLASS_ISPREVERIFIED问题的解决方法。<br>引起整个问题的原因是，在某个类的static，privage，构造函数等方法中，直接引用的所有类都和该类在同一个dex中，那么该类就会被打上CLASS_ISPREVERIFIED记号，引起问题。修改办法是，所有类的构造方法都加上一句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public 构造函数&#123;</div><div class="line">    System.out.println(Test.class);    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>并将Test.class单独放在一个dex中</p>
-<p>5.那新的用于修复bug的dex如何被动态加载呢？可以预留下载接口，查询接口是否有新的dex，如果有，下载到sd卡上，然后再动态加载它。</p>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://www.jianshu.com/p/353514d315a7" target="_blank" rel="external">Android插件化从入门到放弃-最强合集</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">热修复</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/26/android的dex分包技术/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1163,11 +1175,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1175,11 +1187,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件传递</a>
+                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件传递</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1207,19 +1219,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">动画</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">web</a>
+                <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">linux c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">web</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1231,11 +1243,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">绘图</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
