@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: Android Studio | 米兰的小铁铺</title>
+  <title>jni常用函数用法示例 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="米兰的小铁铺">
-<meta property="og:url" content="http://yoursite.com/tags/Android-Studio/index.html">
+  <meta name="description" content="返回字符串java层：12345public class HelloJni &amp;#123;      ...      public native void getAJNIString();      ...  &amp;#125; native层：12345JNIEXPORT jstring JNICALL Java_com_feixun_jni_HelloJni_getAJNIString(JNIEnv">
+<meta name="keywords" content="Jni">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jni常用函数用法示例">
+<meta property="og:url" content="http://yoursite.com/2017/09/26/jni常用函数用法示例/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
+<meta property="og:description" content="返回字符串java层：12345public class HelloJni &amp;#123;      ...      public native void getAJNIString();      ...  &amp;#125; native层：12345JNIEXPORT jstring JNICALL Java_com_feixun_jni_HelloJni_getAJNIString(JNIEnv">
+<meta property="og:updated_time" content="2017-09-26T11:05:07.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="米兰的小铁铺">
+<meta name="twitter:title" content="jni常用函数用法示例">
+<meta name="twitter:description" content="返回字符串java层：12345public class HelloJni &amp;#123;      ...      public native void getAJNIString();      ...  &amp;#125; native层：12345JNIEXPORT jstring JNICALL Java_com_feixun_jni_HelloJni_getAJNIString(JNIEnv">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -157,98 +162,192 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-jni常用函数用法示例" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/Android-Studio中的六种依赖/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:39:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/Android-Studio中的六种依赖/">Android Studio中的六种依赖</a>
+    <h1 class="article-title" itemprop="name">
+      jni常用函数用法示例
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/09/26/jni常用函数用法示例/" class="archive-article-date">
+  	<time datetime="2017-09-26T12:04:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="返回字符串"><a href="#返回字符串" class="headerlink" title="返回字符串"></a>返回字符串</h3><p>java层：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    public native void getAJNIString();  </div><div class="line">    ...  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>native层：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT jstring JNICALL Java_com_feixun_jni_HelloJni_getAJNIString(JNIEnv * env, jobject obj)  </div><div class="line">&#123;  </div><div class="line">    jstring str = env-&gt;newStringUTF(&quot;HelloJNI&quot;);  //直接使用该JNI构造一个jstring对象返回  </div><div class="line">    return str ;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="返回数组"><a href="#返回数组" class="headerlink" title="返回数组"></a>返回数组</h3><p>java层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    private native int[][] getTwoArray(int dimon);</div><div class="line">    ...  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>native层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT jobjectArray JNICALL Java_com_feixun_jni_HelloJni_getTwoArray  </div><div class="line">  (JNIEnv * env, jobject object, jint dimion)  </div><div class="line">&#123;  </div><div class="line">      </div><div class="line">    jclass intArrayClass = env-&gt;FindClass(&quot;[I&quot;); //获得一维数组 的类引用，即jintArray类型  </div><div class="line">    //构造一个指向jintArray类一维数组的对象数组，该对象数组初始大小为dimion  </div><div class="line">    jobjectArray obejctIntArray  =  env-&gt;NewObjectArray(dimion ,intArrayClass , NULL);  </div><div class="line">  </div><div class="line">    //构建dimion个一维数组，并且将其引用赋值给obejctIntArray对象数组  </div><div class="line">    for( int i = 0 ; i&lt; dimion  ; i++ )  </div><div class="line">    &#123;  </div><div class="line">        //构建jint型一维数组  </div><div class="line">        jintArray intArray = env-&gt;NewIntArray(dimion);  </div><div class="line">  </div><div class="line">        jint temp[10]  ;  //初始化一个容器，假设 dimion  &lt; 10 ;  </div><div class="line">        for( int j = 0 ; j &lt; dimion ; j++)  </div><div class="line">        &#123;  </div><div class="line">            temp[j] = i + j  ; //赋值  </div><div class="line">        &#125;  </div><div class="line">          </div><div class="line">        //设置jit型一维数组的值  </div><div class="line">        env-&gt;SetIntArrayRegion(intArray, 0 , dimion ,temp);  </div><div class="line">        //给object对象数组赋值，即保持对jint一维数组的引用  </div><div class="line">        env-&gt;SetObjectArrayElement(obejctIntArray , i ,intArray);  </div><div class="line">  </div><div class="line">        env-&gt;DeleteLocalRef(intArray);  //删除局部引用  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    return   obejctIntArray; //返回该对象数组  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="在Native层操作Java层的类-：读取-设置类属性"><a href="#在Native层操作Java层的类-：读取-设置类属性" class="headerlink" title="在Native层操作Java层的类 ：读取/设置类属性"></a>在Native层操作Java层的类 ：读取/设置类属性</h3><p>java层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    //在Native层读取/设置属性值  </div><div class="line">    public native void native_set_name() ;  </div><div class="line">    ...  </div><div class="line">      </div><div class="line">    private String name = &quot;I am at Java&quot; ; //类属性  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>natvie层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT void JNICALL Java_com_feixun_jni_HelloJni_native_1set_1name  </div><div class="line">  (JNIEnv *env , jobject  obj )  //obj代表执行此JNI操作的类实例引用  </div><div class="line">&#123;  </div><div class="line">   //获得jfieldID 以及 该字段的初始值  </div><div class="line">   jfieldID  nameFieldId ;  </div><div class="line">  </div><div class="line">   jclass cls = env-&gt;GetObjectClass(obj);  //获得Java层该对象实例的类引用，即HelloJNI类引用  </div><div class="line">  </div><div class="line">   nameFieldId = env-&gt;GetFieldID(cls , &quot;name&quot; , &quot;Ljava/lang/String;&quot;); //获得属性句柄  </div><div class="line">  </div><div class="line">   if(nameFieldId == NULL)  </div><div class="line">   &#123;  </div><div class="line">       cout &lt;&lt; &quot; 没有得到name 的句柄Id \n;&quot; ;  </div><div class="line">   &#125;  </div><div class="line">   jstring javaNameStr = (jstring)env-&gt;GetObjectField(obj ,nameFieldId);  // 获得该属性的值  </div><div class="line">   const char * c_javaName = env-&gt;GetStringUTFChars(javaNameStr , NULL);  //转换为 char *类型  </div><div class="line">   string str_name = c_javaName ;    </div><div class="line">   cout &lt;&lt; &quot;the name from java is &quot; &lt;&lt; str_name &lt;&lt; endl ; //输出显示  </div><div class="line">   env-&gt;ReleaseStringUTFChars(javaNameStr , c_javaName);  //释放局部引用  </div><div class="line">  </div><div class="line">   //构造一个jString对象  </div><div class="line">   char * c_ptr_name = &quot;I come from Native&quot; ;  </div><div class="line">     </div><div class="line">   jstring cName = env-&gt;NewStringUTF(c_ptr_name); //构造一个jstring对象  </div><div class="line">  </div><div class="line">   env-&gt;SetObjectField(obj , nameFieldId , cName); // 设置该字段的值  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="在Native层操作Java层的类：回调Java方法"><a href="#在Native层操作Java层的类：回调Java方法" class="headerlink" title="在Native层操作Java层的类：回调Java方法"></a>在Native层操作Java层的类：回调Java方法</h3><p>java层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    //Native层回调的方法实现  </div><div class="line">    public void callback(String fromNative)&#123;       </div><div class="line">        System.out.println(&quot; I was invoked by native method  ############# &quot; + fromNative);  </div><div class="line">    &#125;;  </div><div class="line">    public native void doCallBack(); //Native层会调用callback()方法  </div><div class="line">    ...   </div><div class="line">      </div><div class="line">    // main函数  </div><div class="line">    public static void main(String[] args)   </div><div class="line">    &#123;  </div><div class="line">        new HelloJni().ddoCallBack();  </div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>native层<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT void JNICALL Java_com_feixun_jni_HelloJni_doCallBack  </div><div class="line">  (JNIEnv * env , jobject obj)  </div><div class="line">&#123;  </div><div class="line">     //回调Java中的方法  </div><div class="line">  </div><div class="line">    jclass cls = env-&gt;GetObjectClass(obj);//获得Java类实例  </div><div class="line">    jmethodID callbackID = env-&gt;GetMethodID(cls , &quot;callback&quot; , &quot;(Ljava/lang/String;)V&quot;) ;//或得该回调方法句柄  </div><div class="line">  </div><div class="line">    if(callbackID == NULL)  </div><div class="line">    &#123;  </div><div class="line">         cout &lt;&lt; &quot;getMethodId is failed \n&quot; &lt;&lt; endl ;  </div><div class="line">    &#125;  </div><div class="line">    </div><div class="line">    jstring native_desc = env-&gt;NewStringUTF(&quot; I am Native&quot;);  </div><div class="line">  </div><div class="line">    env-&gt;CallVoidMethod(obj , callbackID , native_desc); //回调该方法，并且传递参数值  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="在Native层返回一个复杂对象-即一个类咯"><a href="#在Native层返回一个复杂对象-即一个类咯" class="headerlink" title="在Native层返回一个复杂对象(即一个类咯)"></a>在Native层返回一个复杂对象(即一个类咯)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    //在Native层返回一个Student对象  </div><div class="line">    public native Student nativeGetStudentInfo() ;  </div><div class="line">    ...   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT jobject JNICALL Java_com_feixun_jni_HelloJni_nativeGetStudentInfo  </div><div class="line">  (JNIEnv * env, jobject obl)  </div><div class="line">&#123;  </div><div class="line">    //关于包描述符，这儿可以是 com/feixun/jni/Student 或者是 Lcom/feixun/jni/Student;   </div><div class="line">    //   这两种类型 都可以获得class引用  </div><div class="line">    jclass stucls = env-&gt;FindClass(&quot;com/feixun/jni/Student&quot;); //或得Student类引用  </div><div class="line">  </div><div class="line">    //获得得该类型的构造函数  函数名为 &lt;init&gt; 返回类型必须为 void 即 V  </div><div class="line">    jmethodID constrocMID = env-&gt;GetMethodID(stucls,&quot;&lt;init&gt;&quot;,&quot;(ILjava/lang/String;)V&quot;);  </div><div class="line">  </div><div class="line">    jstring str = env-&gt;NewStringUTF(&quot; come from Native &quot;);  </div><div class="line">  </div><div class="line">    jobject stu_ojb = env-&gt;NewObject(stucls,constrocMID,11,str);  //构造一个对象，调用该类的构造函数，并且传递参数  </div><div class="line">  </div><div class="line">  </div><div class="line">    return stu_ojb ;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="从Java层传递复杂对象至Native层"><a href="#从Java层传递复杂对象至Native层" class="headerlink" title="从Java层传递复杂对象至Native层"></a>从Java层传递复杂对象至Native层</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    //在Native层打印Student的信息  </div><div class="line">    public native void  printStuInfoAtNative(Student stu);  </div><div class="line">    ...   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT void JNICALL Java_com_feixun_jni_HelloJni_printStuInfoAtNative  </div><div class="line">  (JNIEnv * env, jobject obj,  jobject obj_stu) //第二个类实例引用代表Student类，即我们传递下来的对象  </div><div class="line">&#123;  </div><div class="line">      </div><div class="line">    jclass stu_cls = env-&gt;GetObjectClass(obj_stu); //或得Student类引用  </div><div class="line">  </div><div class="line">    if(stu_cls == NULL)  </div><div class="line">    &#123;  </div><div class="line">        cout &lt;&lt; &quot;GetObjectClass failed \n&quot; ;  </div><div class="line">    &#125;  </div><div class="line">    //下面这些函数操作，我们都见过的。O(∩_∩)O~  </div><div class="line">    jfieldID ageFieldID = env-&gt;GetFieldID(stucls,&quot;age&quot;,&quot;I&quot;); //获得得Student类的属性id   </div><div class="line">    jfieldID nameFieldID = env-&gt;GetFieldID(stucls,&quot;name&quot;,&quot;Ljava/lang/String;&quot;); // 获得属性ID  </div><div class="line">  </div><div class="line">    jint age = env-&gt;GetIntField(objstu , ageFieldID);  //获得属性值  </div><div class="line">    jstring name = (jstring)env-&gt;GetObjectField(objstu , nameFieldID);//获得属性值  </div><div class="line">  </div><div class="line">    const char * c_name = env-&gt;GetStringUTFChars(name ,NULL);//转换成 char *  </div><div class="line">   </div><div class="line">    string str_name = c_name ;   </div><div class="line">    env-&gt;ReleaseStringUTFChars(name,c_name); //释放引用  </div><div class="line">      </div><div class="line">    cout &lt;&lt; &quot; at Native age is :&quot; &lt;&lt; age &lt;&lt; &quot; # name is &quot; &lt;&lt; str_name &lt;&lt; endl ;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="在Native层返回集合对象"><a href="#在Native层返回集合对象" class="headerlink" title="在Native层返回集合对象"></a>在Native层返回集合对象</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class HelloJni &#123;  </div><div class="line">    ...  </div><div class="line">    //在Native层返回ArrayList集合   </div><div class="line">    public native ArrayList&lt;Student&gt; native_getListStudents();  </div><div class="line">    ...   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">JNIEXPORT jobject JNICALL Java_com_feixun_jni_HelloJni_native_getListStudents  </div><div class="line">  (JNIEnv * env, jobject obj)  </div><div class="line">&#123;  </div><div class="line">    jclass list_cls = env-&gt;FindClass(&quot;Ljava/util/ArrayList;&quot;);//获得ArrayList类引用  </div><div class="line">  </div><div class="line">    if(listcls == NULL)  </div><div class="line">    &#123;  </div><div class="line">        cout &lt;&lt; &quot;listcls is null \n&quot; ;  </div><div class="line">    &#125;  </div><div class="line">    jmethodID list_costruct = env-&gt;GetMethodID(list_cls , &quot;&lt;init&gt;&quot;,&quot;()V&quot;); //获得得构造函数Id  </div><div class="line">  </div><div class="line">    jobject list_obj = env-&gt;NewObject(list_cls , list_costruct); //创建一个Arraylist集合对象  </div><div class="line">    //或得Arraylist类中的 add()方法ID，其方法原型为： boolean add(Object object) ;  </div><div class="line">    jmethodID list_add  = env-&gt;GetMethodID(list_cls,&quot;add&quot;,&quot;(Ljava/lang/Object;)Z&quot;);   </div><div class="line">    </div><div class="line">    jclass stu_cls = env-&gt;FindClass(&quot;Lcom/feixun/jni/Student;&quot;);//获得Student类引用  </div><div class="line">    //获得该类型的构造函数  函数名为 &lt;init&gt; 返回类型必须为 void 即 V  </div><div class="line">    jmethodID stu_costruct = env-&gt;GetMethodID(stu_cls , &quot;&lt;init&gt;&quot;, &quot;(ILjava/lang/String;)V&quot;);  </div><div class="line">  </div><div class="line">    for(int i = 0 ; i &lt; 3 ; i++)  </div><div class="line">    &#123;  </div><div class="line">        jstring str = env-&gt;NewStringUTF(&quot;Native&quot;);  </div><div class="line">        //通过调用该对象的构造函数来new 一个 Student实例  </div><div class="line">        jobject stu_obj = env-&gt;NewObject(stucls , stu_costruct , 10,str);  //构造一个对象  </div><div class="line">          </div><div class="line">        env-&gt;CallBooleanMethod(list_obj , list_add , stu_obj); //执行Arraylist类实例的add方法，添加一个stu对象  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    return list_obj ;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Android Studio</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/jni常用函数用法示例/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/使用Android-Studio阅读android系统源码/" class="archive-article-date">
-  	<time datetime="2017-09-23T11:11:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2017/09/26/Anroid-触摸事件传递机制总结/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Anroid 触摸事件传递机制总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/使用Android-Studio阅读android系统源码/">使用Android Studio阅读android系统源码</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Android Studio</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#返回字符串"><span class="toc-number">1.</span> <span class="toc-text">返回字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#返回数组"><span class="toc-number">2.</span> <span class="toc-text">返回数组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Native层操作Java层的类-：读取-设置类属性"><span class="toc-number">3.</span> <span class="toc-text">在Native层操作Java层的类 ：读取/设置类属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Native层操作Java层的类：回调Java方法"><span class="toc-number">4.</span> <span class="toc-text">在Native层操作Java层的类：回调Java方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Native层返回一个复杂对象-即一个类咯"><span class="toc-number">5.</span> <span class="toc-text">在Native层返回一个复杂对象(即一个类咯)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从Java层传递复杂对象至Native层"><span class="toc-number">6.</span> <span class="toc-text">从Java层传递复杂对象至Native层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Native层返回集合对象"><span class="toc-number">7.</span> <span class="toc-text">在Native层返回集合对象</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -271,9 +370,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

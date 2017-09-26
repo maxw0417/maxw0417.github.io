@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: Android Studio | 米兰的小铁铺</title>
+  <title>Anroid 触摸事件传递机制总结 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="米兰的小铁铺">
-<meta property="og:url" content="http://yoursite.com/tags/Android-Studio/index.html">
+  <meta name="description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
+<meta name="keywords" content="事件传递">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Anroid 触摸事件传递机制总结">
+<meta property="og:url" content="http://yoursite.com/2017/09/26/Anroid-触摸事件传递机制总结/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
+<meta property="og:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
+<meta property="og:updated_time" content="2017-09-26T11:09:25.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="米兰的小铁铺">
+<meta name="twitter:title" content="Anroid 触摸事件传递机制总结">
+<meta name="twitter:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -157,98 +162,212 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Anroid-触摸事件传递机制总结" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/25/Android-Studio中的六种依赖/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:39:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/25/Android-Studio中的六种依赖/">Android Studio中的六种依赖</a>
+    <h1 class="article-title" itemprop="name">
+      Anroid 触摸事件传递机制总结
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/09/26/Anroid-触摸事件传递机制总结/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:08:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。</p>
+<p>View的相关函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// 如果view是clickable，longclickable，contextclickable，返回true，否则返回false</div><div class="line">public boolean onTouchEvent(MotionEvent event) &#123;</div><div class="line">    ...</div><div class="line">&#125;</div><div class="line"></div><div class="line">//view中返回onTouchEvent的结果，viewgroup，需要参考onInterceptTouchEvent的结果进行决定是否自己处理（自己的onTouchEvent）还是分发给内层view的dispatchTouchEvent方法</div><div class="line">public boolean dispatchTouchEvent(MotionEvent event) &#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>viewgroup的相关函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// viewgoup中独有的函数，默认返回false，即不拦截事件，事件将从父view传递到子view的dispatchTouchEvent中去。</div><div class="line">public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</div><div class="line">        return false;</div><div class="line">&#125;</div><div class="line">//注意，viewgroup中dispatchTouchEvent已经被override了。</div><div class="line">@Override</div><div class="line">public boolean dispatchTouchEvent(MotionEvent ev) &#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="dispatchTouchEvent"><a href="#dispatchTouchEvent" class="headerlink" title="dispatchTouchEvent"></a>dispatchTouchEvent</h3><p>控件中第一个收到事件的就是dispatchTouchEvent函数，起到分发作用，此函数在view和viewgroup中都有，但实现并不相同，因此作用也有所区别。在view中，dispatchTouchEvent最终会调用view的onTouch方法对事件进行处理。在viewgroup中，会先通过onInterceptTouchEvent判断是否需要拦截事件，如果需要拦截，事件就流入自己的onTouchEvent中进行处理，如果不拦截，事件将传入子view（或viewgroup）的dispatchTouchEvent中。dispatchTouchEvent返回false时，事件流入父view的onTouchEvent方法中。</p>
+<h3 id="onTouchEvent"><a href="#onTouchEvent" class="headerlink" title="onTouchEvent"></a>onTouchEvent</h3><p>1、viewgroup，view中都有</p>
+<p>2、处理touch事件的地方，若返回true，表示事件处理完毕，若返回false，事件将返回至父viewgroup的onTouch中进行处理。</p>
+<h3 id="onInterceptTouchEvent"><a href="#onInterceptTouchEvent" class="headerlink" title="onInterceptTouchEvent"></a>onInterceptTouchEvent</h3><p>1、此函数时viewgroup中才有，view中是没有的</p>
+<p>2、在默认实现下，此函数是viewgroup用来判断是否拦截事件的依据，若onInterceptTouchEvent返回值是false，则viewgroup不会拦截此事件，事件将继续传递给子view，若返回值是true，则viewgroup会拦截此事件，将事件送往viewgroup的onTouchEvent中进行处理</p>
+<h2 id="move、up事件与down事件的关系"><a href="#move、up事件与down事件的关系" class="headerlink" title="move、up事件与down事件的关系"></a>move、up事件与down事件的关系</h2><p>down事件是一组触摸事件的开始，它决定了后续事件，例如move、up等事件的走向。</p>
+<p>实际上，down事件最终流向哪里（被哪个view消费掉），后续的所有事件也都流向同一个地方，由同一个view消费。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>事件是从外层view逐步往内层view传递的</p>
+<p>view中消费事件的地方有两个，onTouchEvent方法以及dispatchTouchEvent方法，这两个方法只要返回true，就表示事件被消费了，不会被继续传递了</p>
+<p>每一层view都可以做出三种决定：</p>
+<p>1.自己消费：</p>
+<p>对于view来说，默认就是自己消费，即view的dispatchTouchEvent会将事件送入自己的onTouchEvent进行处理。</p>
+<p>对于viewgroup来说，需要在onInterceptTouchEvent方法种返回true，这样事件就将被送往自己的onTouchEvent进行处理。</p>
+<p>2.传递给内层</p>
+<p>对于view来说，没有内层的view了，所以不存在继续往内层传递的情况。</p>
+<p>对于viewgroup来说，只要onInterceptTouchEvent方法返回false，就会通过调用内层view的dispatchTouchEvent，将事件送入内层的view中。</p>
+<p>3.返回给外层</p>
+<p>这里说的返回给外层，实际上并不是直接返回去，而是内层和自己都已经处理过一遍了，只不过并没有“消费掉”，也就是onTouchEvent没有返回true，dispatchTouchEvent也没有返回true，所以event会回到外层view的onTouchEvent中，如果外层的onTouchEvent也返回false，继续往更外层的onTouchEvent()中传递。</p>
+<h2 id="滑动冲突解决方案"><a href="#滑动冲突解决方案" class="headerlink" title="滑动冲突解决方案"></a>滑动冲突解决方案</h2><p>滑动冲突，就是两个view嵌套，两个view都需要对滑动事件做出响应的情况，例如外层的view需要响应左右滑动，内层的view需要响应上下滑动，那么触摸事件分发给谁呢？如果分发给外层的view，那么内层view上下滑动的功能就失效了，反之，如果分发给内层的view处理，那外层view的左右滑动功能将会失效<br>解决方案两个，一个是外层拦截，一个是内层拦截。</p>
+<h3 id="外部拦截"><a href="#外部拦截" class="headerlink" title="外部拦截"></a>外部拦截</h3><p>在外层view的onInterceptTouchEvent中做处理，判断触摸事件是上下滑动的还是左右滑动的，如果左右滑动，onInterceptTouchEvent返回true，这样，触摸事件将被分发到外层view的onTuchEvent方法中，又外层view消费掉。如果是上下滑动，onInterceptTouchEvent返回false，触摸事件将被分发到内层view的dispatchTouchEvent中，又内层view进行处理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public boolean onInterceptTouchEvent(MotionEvent event) &#123;</div><div class="line">        boolean intercepted = false;</div><div class="line"> </div><div class="line">        switch (event.getAction()) &#123;</div><div class="line">            case MotionEvent.ACTION_DOWN: &#123;</div><div class="line">                intercepted = false;</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">            case MotionEvent.ACTION_MOVE: &#123;</div><div class="line">                if (满足父容器的拦截要求) &#123;</div><div class="line">                    intercepted = true;</div><div class="line">                &#125; else &#123;</div><div class="line">                    intercepted = false;</div><div class="line">                &#125;</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">            case MotionEvent.ACTION_UP: &#123;</div><div class="line">                intercepted = false;</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">            default:</div><div class="line">                break;</div><div class="line">        &#125;</div><div class="line">        mLastXIntercept = x;</div><div class="line">        mLastYIntercept = y;</div><div class="line">        return intercepted;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h3 id="内部拦截法"><a href="#内部拦截法" class="headerlink" title="内部拦截法"></a>内部拦截法</h3><p>父容器不拦截任何事件，所有事件都传给子元素。如果子元素需要此事件就直接消耗，否则就交给父容器进行处理。完成这个功能需要配合requestDisallowInterceptTouchEvent()方法才可。这个方法表示是否让父容器拦截事件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public boolean dispatchTouchEvent(MotionEvent event) &#123;</div><div class="line">        int x = (int) event.getX();</div><div class="line">        int y = (int) event.getY();</div><div class="line"> </div><div class="line">        switch (event.getAction()) &#123;</div><div class="line">        case MotionEvent.ACTION_DOWN: &#123;</div><div class="line">            parent.requestDisallowInterceptTouchEvent(true);</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        case MotionEvent.ACTION_MOVE: &#123;</div><div class="line">            if (满足父容器的拦截要求) &#123;</div><div class="line">                parent.requestDisallowInterceptTouchEvent(false);</div><div class="line">            &#125;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        case MotionEvent.ACTION_UP: &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        default:</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        mLastX = x;</div><div class="line">        mLastY = y;</div><div class="line">        return super.dispatchTouchEvent(event);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Android Studio</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件传递</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/Anroid-触摸事件传递机制总结/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/使用Android-Studio阅读android系统源码/" class="archive-article-date">
-  	<time datetime="2017-09-23T11:11:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/09/26/jni常用函数用法示例/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          jni常用函数用法示例
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/26/使用android-studio开发jni/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">使用android studio开发jni</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/使用Android-Studio阅读android系统源码/">使用Android Studio阅读android系统源码</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Android Studio</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#dispatchTouchEvent"><span class="toc-number">1.</span> <span class="toc-text">dispatchTouchEvent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#onTouchEvent"><span class="toc-number">2.</span> <span class="toc-text">onTouchEvent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#onInterceptTouchEvent"><span class="toc-number">3.</span> <span class="toc-text">onInterceptTouchEvent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#move、up事件与down事件的关系"><span class="toc-number"></span> <span class="toc-text">move、up事件与down事件的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number"></span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#滑动冲突解决方案"><span class="toc-number"></span> <span class="toc-text">滑动冲突解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#外部拦截"><span class="toc-number">1.</span> <span class="toc-text">外部拦截</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内部拦截法"><span class="toc-number">2.</span> <span class="toc-text">内部拦截法</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -271,9 +390,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
