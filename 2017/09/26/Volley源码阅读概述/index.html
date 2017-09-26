@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 博客搭建 | 米兰的小铁铺</title>
+  <title>Volley源码阅读概述 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="米兰的小铁铺">
-<meta property="og:url" content="http://yoursite.com/tags/博客搭建/index.html">
+  <meta name="description" content="RequestQueueRequestQueue有一个CacheDispatcher和若干个NetworkDispatcer，分别用mCacheDispatcher和mDispatcher成员变量表示，Dispatcher实际上就是一个thread，在这个thread的run方法中，通过while循环不停的queue中take出request，交给Network（实现类为BaseNetwork）进">
+<meta name="keywords" content="开源框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源码阅读概述">
+<meta property="og:url" content="http://yoursite.com/2017/09/26/Volley源码阅读概述/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
+<meta property="og:description" content="RequestQueueRequestQueue有一个CacheDispatcher和若干个NetworkDispatcer，分别用mCacheDispatcher和mDispatcher成员变量表示，Dispatcher实际上就是一个thread，在这个thread的run方法中，通过while循环不停的queue中take出request，交给Network（实现类为BaseNetwork）进">
+<meta property="og:updated_time" content="2017-09-26T11:17:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="米兰的小铁铺">
+<meta name="twitter:title" content="Volley源码阅读概述">
+<meta name="twitter:description" content="RequestQueueRequestQueue有一个CacheDispatcher和若干个NetworkDispatcer，分别用mCacheDispatcher和mDispatcher成员变量表示，Dispatcher实际上就是一个thread，在这个thread的run方法中，通过while循环不停的queue中take出request，交给Network（实现类为BaseNetwork）进">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -157,60 +162,203 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Volley源码阅读概述" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/23/Github+Hexo个人博客搭建/" class="archive-article-date">
-  	<time datetime="2017-09-23T08:22:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/23/Github+Hexo个人博客搭建/">Github+Hexo个人博客搭建</a>
+    <h1 class="article-title" itemprop="name">
+      Volley源码阅读概述
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/09/26/Volley源码阅读概述/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:17:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="RequestQueue"><a href="#RequestQueue" class="headerlink" title="RequestQueue"></a>RequestQueue</h2><p>RequestQueue有一个CacheDispatcher和若干个NetworkDispatcer，分别用mCacheDispatcher和mDispatcher成员变量表示，Dispatcher实际上就是一个thread，在这个thread的run方法中，通过while循环不停的queue中take出request，交给Network（实现类为BaseNetwork）进行处理（performRequest），在performRequest中，调用不同的HttpStack的performRequest方法进行最终的网络请求，这里才是真正处理网络交互的地方，不同的android版本使用的HttpStack实现是不同的，api9以下使用的是基于httpclient的httpclientstack，而9以上使用的是基于httpurlconnection的hurlstack。</p>
+<h2 id="Volley"><a href="#Volley" class="headerlink" title="Volley"></a>Volley</h2><p>volley的入口类，主要用于构建新的请求队列requestQueue，并为其制定所使用httpurlconnection。构建网络处理类Network，构建磁盘缓存Diskbasedcache等等。</p>
+<h2 id="DiskbasedCache"><a href="#DiskbasedCache" class="headerlink" title="DiskbasedCache"></a>DiskbasedCache</h2><p>缓存位置：new File(context.getCacheDir(),”volley”）<br>，即data/data/<package name="">/cache/volley文件夹。<br>缓存是以Entry的数据结构进行存储的，其主要成员是btye[] data。Entry的来源是response，networkdispatcher在处理response的之后，HttpHeaderParser会parseCacheHeader,得到这个Cache.Entry对象。<br>缓存的条件有两个：<br>1.rquest的shouldCache()返回true,这个可以通过setShouldCache(true)设置。<br>2.requeset的parseNetworkResponse()方法被重写的时候，返回值Response对象的cacheEntry对象不能为null，所以自定义request在重写这个方法的时候，最好通过HttpHeaderParser的parseCacheHeaders方法生成一个entry，并赋值给response对象。推荐这么写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//parsed是request解析后的结果，也就是网络请求的结果</div><div class="line">//success是Response类的静态方法</div><div class="line">//response是NetworkResponse类的对象，和Response类无关，不要搞成一个。</div><div class="line">Response.success(parsed,HttpHeaderParser.parseCacheHeaders(response));</div></pre></td></tr></table></figure></package></p>
+<p>一但确定需要缓存，NetworkDispatcher的成员变量DiskbasedCache就会通过put(key,value)将其缓存。<br>缓存除了将数据写入文件外，在DiskbasedCache中也会有一个LinkedHashMap进行内存的缓存。注意，entry的信息主要有两部分，一部分是头信息，另一部分是元数据，这里写入文件的是元数据，即entry.data,而写入内存LinkedHashMap的是entry的头信息。取缓存的时候，先从内存中找entry的头信息，找得到才会继续从文件里读元数据，找不到就不读了，返回null。将从文件中取到的data和从内存中取到的头信息再次拼成entry，这样就取到了缓存数据entry了。每个entry都存放在一个单独的文件中，文件名的起名有专门的规则，不细纠。<br>默认的磁盘缓存上限是5mb,当然可以调整的。</p>
+<h2 id="发送网络请求过程networkqueue-add-request"><a href="#发送网络请求过程networkqueue-add-request" class="headerlink" title="发送网络请求过程networkqueue.add(request)"></a>发送网络请求过程networkqueue.add(request)</h2><p>1.将request放入一个mCurrentRequest的set中</p>
+<p>2.判断request是否需要缓存，如果不需要，直接放入mNetworkQueue中。这个队列是被networkdispatcher使用的，networkdispatcher就是从这个队列中取出request进行处理的。</p>
+<p>3.request是否在waitingRequest中有同样类型的请求，如果不在，将其放入waitingRequest中，并且将其交给mCacheQueue，这个队列是给CacheDispather使用的。</p>
+<p>4.request在waitingRequest中是以map形式存放的，key是url+method，value是一个存放request的queue，也就是说，对同一种请求的多个请求存放在这个key-value中。<br>如果request在其中已经存在，说明之前有相同的请求了，这个是重复请求，将不会被发送。</p>
+<p>5.请求如果处理完毕，waitingRequest中的请求将被移除。</p>
+<h2 id="关于多线程"><a href="#关于多线程" class="headerlink" title="关于多线程"></a>关于多线程</h2><p>volley中有一个cachedispatcher，就是一个线程，有n个networkdispatcher，就是n个线程，默认n为4，也可以修改，但是就不能通过Volley.newRequestQueue()的api进行Requeue的初始化了，而是需要自己new一个RequestQueue，传递线程数量进去。</p>
+<h2 id="Networkdispatcher"><a href="#Networkdispatcher" class="headerlink" title="Networkdispatcher"></a>Networkdispatcher</h2><p>一个线程，从networkqueue中取出request进行处理，可以有多个。将request送入basenetowrk类进行网络请求，之后根据需要缓存请求和响应，最后交给ExecutorDeliver进行结果的分发处理。</p>
+<h2 id="CacheDispatcher"><a href="#CacheDispatcher" class="headerlink" title="CacheDispatcher"></a>CacheDispatcher</h2><p>一个线程，且只有一个，从cachequeue中取request进行处理，相比networkdispatcher而言，cachedispatcher会先尝试从本地取请求对应的响应，如果没取到或者响应过期了或者needrefresh了，才会将request丢进networkqueue中，等待networkdispatcher处理。如果取到了，将request和response交给ExecutorDeliver处理。</p>
+<h2 id="ExecutorDeliver"><a href="#ExecutorDeliver" class="headerlink" title="ExecutorDeliver"></a>ExecutorDeliver</h2><p>用来分发请求的响应结果的。<br>内含一个线程池，执行ResponseDeliverRunnable，在该runnable的run中，执行如下操作：</p>
+<p>1.将响应结果分发到对应的回调方法。</p>
+<p>2.request的finish</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">博客搭建</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">开源框架</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/Volley源码阅读概述/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2017/09/26/Retrofit使用示例/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Retrofit使用示例
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2017/09/26/android的dex分包技术/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android的dex分包技术</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RequestQueue"><span class="toc-number">1.</span> <span class="toc-text">RequestQueue</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Volley"><span class="toc-number">2.</span> <span class="toc-text">Volley</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DiskbasedCache"><span class="toc-number">3.</span> <span class="toc-text">DiskbasedCache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#发送网络请求过程networkqueue-add-request"><span class="toc-number">4.</span> <span class="toc-text">发送网络请求过程networkqueue.add(request)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于多线程"><span class="toc-number">5.</span> <span class="toc-text">关于多线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Networkdispatcher"><span class="toc-number">6.</span> <span class="toc-text">Networkdispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CacheDispatcher"><span class="toc-number">7.</span> <span class="toc-text">CacheDispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ExecutorDeliver"><span class="toc-number">8.</span> <span class="toc-text">ExecutorDeliver</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -233,9 +381,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

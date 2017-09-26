@@ -159,6 +159,167 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-App的启动过程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/App的启动过程/">App的启动过程</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/App的启动过程/" class="archive-article-date">
+  	<time datetime="2017-09-26T04:44:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一个普通Android应用的启动，通常是从点击桌面icon开始的,所以，我们从这里开始</p>
+<h2 id="主要流程概述"><a href="#主要流程概述" class="headerlink" title="主要流程概述"></a>主要流程概述</h2><p>Launcher.startActivitySafely() // 1.桌面应用启动app的入口<br>    Activity.startActivity(); //2<br>        Activity.startActivityForResult(); //3.<br>            Instrumentation.execStartActivity(); //4.<br>                ActivityManagerService.startActivity(); // 5.通过ActivityManager代理，调用ams的startActivity<br>                    ActivityStarter.startActivityMayWait(); // 6.<br>                        ActivityStarter.startActivityLocked(); // 7<br>                            ActivityStarter.startActivity();// 8.这<br>                                ActivityStarter.startActivity();// 9.这是9个参数的startActivity<br>                                    ActivityStarter.startActivityUnchecked();// 10.<br>                                        ActivityStack.startActivityLocked //11. ams端，将activityrecord记录保存</p>
+<h2 id="各流程主要代码"><a href="#各流程主要代码" class="headerlink" title="各流程主要代码"></a>各流程主要代码</h2><h3 id="1-桌面启动app"><a href="#1-桌面启动app" class="headerlink" title="1.桌面启动app"></a>1.桌面启动app</h3><p>Launcher.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startActivitySafely</span><span class="params">(View v, Intent intent, ItemInfo item)</span> </span>&#123;</div><div class="line">       	<span class="comment">// Prepare intent</span></div><div class="line">        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</div><div class="line"></div><div class="line">        <span class="comment">//...</span></div><div class="line">        <span class="keyword">if</span> (Utilities.ATLEAST_MARSHMALLOW</div><div class="line">                    &amp;&amp; (item <span class="keyword">instanceof</span> ShortcutInfo)</div><div class="line">                    &amp;&amp; (item.itemType == Favorites.ITEM_TYPE_SHORTCUT</div><div class="line">                     || item.itemType == Favorites.ITEM_TYPE_DEEP_SHORTCUT)</div><div class="line">                    &amp;&amp; !((ShortcutInfo) item).isPromise()) &#123;</div><div class="line">                <span class="comment">// Shortcuts need some special checks due to legacy reasons.</span></div><div class="line">                startShortcutIntentSafely(intent, optsBundle, item);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (user == <span class="keyword">null</span> || user.equals(Process.myUserHandle())) &#123;</div><div class="line">                <span class="comment">// Could be launching some bookkeeping activity</span></div><div class="line">                startActivity(intent, optsBundle);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                LauncherAppsCompat.getInstance(<span class="keyword">this</span>).startActivityForProfile(</div><div class="line">                        intent.getComponent(), user, intent.getSourceBounds(), optsBundle);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        <span class="comment">//...</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>4.Instrumentation.execStartActivity()方法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> ActivityResult <span class="title">execStartActivity</span><span class="params">(</span></span></div><div class="line"><span class="function"><span class="params">            Context who, IBinder contextThread, IBinder token, Activity target,</span></span></div><div class="line"><span class="function"><span class="params">            Intent intent, <span class="keyword">int</span> requestCode, Bundle options)</span> </span>&#123;</div><div class="line"></div><div class="line">    intent.migrateExtraStreamToClipData();</div><div class="line">    intent.prepareToLeaveProcess(who);</div><div class="line">    <span class="keyword">int</span> result = ActivityManager.getService().startActivity(whoThread, who.getBasePackageName(), intent,</div><div class="line">                        intent.resolveTypeIfNeeded(who.getContentResolver()),</div><div class="line">                        token, target != <span class="keyword">null</span> ? target.mEmbeddedID : <span class="keyword">null</span>,</div><div class="line">                        requestCode, <span class="number">0</span>, <span class="keyword">null</span>, options);</div><div class="line">    checkStartActivityResult(result, intent);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>ActivityManager.java中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IActivityManager <span class="title">getService</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> IActivityManagerSingleton.get();</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton&lt;IActivityManager&gt; IActivityManagerSingleton =</div><div class="line">           <span class="keyword">new</span> Singleton&lt;IActivityManager&gt;() &#123;</div><div class="line">               <span class="meta">@Override</span></div><div class="line">               <span class="function"><span class="keyword">protected</span> IActivityManager <span class="title">create</span><span class="params">()</span> </span>&#123;</div><div class="line">                   <span class="keyword">final</span> IBinder b = ServiceManager.getService(Context.ACTIVITY_SERVICE);</div><div class="line">                   <span class="keyword">final</span> IActivityManager am = IActivityManager.Stub.asInterface(b);</div><div class="line">                   <span class="keyword">return</span> am;</div><div class="line">               &#125;</div><div class="line">           &#125;;</div><div class="line"></div><div class="line">           <span class="comment">//...</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>5.ActivityManagerService.startActivity()方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">startActivity</span><span class="params">(IApplicationThread caller, String callingPackage,</span></span></div><div class="line"><span class="function"><span class="params">           Intent intent, String resolvedType, IBinder resultTo, String resultWho, <span class="keyword">int</span> requestCode,</span></span></div><div class="line"><span class="function"><span class="params">           <span class="keyword">int</span> startFlags, ProfilerInfo profilerInfo, Bundle bOptions)</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> startActivityAsUser(caller, callingPackage, intent, resolvedType, resultTo,</div><div class="line">               resultWho, requestCode, startFlags, profilerInfo, bOptions,</div><div class="line">               UserHandle.getCallingUserId());</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">startActivityAsUser</span><span class="params">(IApplicationThread caller, String callingPackage,</span></span></div><div class="line"><span class="function"><span class="params">           Intent intent, String resolvedType, IBinder resultTo, String resultWho, <span class="keyword">int</span> requestCode,</span></span></div><div class="line"><span class="function"><span class="params">           <span class="keyword">int</span> startFlags, ProfilerInfo profilerInfo, Bundle bOptions, <span class="keyword">int</span> userId)</span> </span>&#123;</div><div class="line">       enforceNotIsolatedCaller(<span class="string">"startActivity"</span>);</div><div class="line">       userId = mUserController.handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(),</div><div class="line">               userId, <span class="keyword">false</span>, ALLOW_FULL_ONLY, <span class="string">"startActivity"</span>, <span class="keyword">null</span>);</div><div class="line">       <span class="comment">// <span class="doctag">TODO:</span> Switch to user app stacks here.</span></div><div class="line">       <span class="keyword">return</span> mActivityStarter.startActivityMayWait(caller, -<span class="number">1</span>, callingPackage, intent,</div><div class="line">               resolvedType, <span class="keyword">null</span>, <span class="keyword">null</span>, resultTo, resultWho, requestCode, startFlags,</div><div class="line">               profilerInfo, <span class="keyword">null</span>, <span class="keyword">null</span>, bOptions, <span class="keyword">false</span>, userId, <span class="keyword">null</span>, <span class="keyword">null</span>,</div><div class="line">               <span class="string">"startActivityAsUser"</span>);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>6.ActivityStarter.startActivityMayWait()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">startActivityMayWait</span><span class="params">(IApplicationThread caller, <span class="keyword">int</span> callingUid,</span></span></div><div class="line"><span class="function"><span class="params">           String callingPackage, Intent intent, String resolvedType,</span></span></div><div class="line"><span class="function"><span class="params">           IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,</span></span></div><div class="line"><span class="function"><span class="params">           IBinder resultTo, String resultWho, <span class="keyword">int</span> requestCode, <span class="keyword">int</span> startFlags,</span></span></div><div class="line"><span class="function"><span class="params">           ProfilerInfo profilerInfo, WaitResult outResult,</span></span></div><div class="line"><span class="function"><span class="params">           Configuration globalConfig, Bundle bOptions, <span class="keyword">boolean</span> ignoreTargetSecurity, <span class="keyword">int</span> userId,</span></span></div><div class="line"><span class="function"><span class="params">           IActivityContainer iContainer, TaskRecord inTask, String reason)</span> </span>&#123;</div><div class="line"></div><div class="line"></div><div class="line">           <span class="comment">// ...</span></div><div class="line">           <span class="keyword">int</span> res = startActivityLocked(caller, intent, ephemeralIntent, resolvedType,</div><div class="line">                   aInfo, rInfo, voiceSession, voiceInteractor,</div><div class="line">                   resultTo, resultWho, requestCode, callingPid,</div><div class="line">                   callingUid, callingPackage, realCallingPid, realCallingUid, startFlags,</div><div class="line">                   options, ignoreTargetSecurity, componentSpecified, outRecord, container,</div><div class="line">                   inTask, reason);</div><div class="line"></div><div class="line">   		<span class="comment">// ...</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>10.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">startActivityUnchecked</span><span class="params">(<span class="keyword">final</span> ActivityRecord r, ActivityRecord sourceRecord,</span></span></div><div class="line"><span class="function"><span class="params">           IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,</span></span></div><div class="line"><span class="function"><span class="params">           <span class="keyword">int</span> startFlags, <span class="keyword">boolean</span> doResume, ActivityOptions options, TaskRecord inTask,</span></span></div><div class="line"><span class="function"><span class="params">           ActivityRecord[] outActivity)</span> </span>&#123;</div><div class="line"></div><div class="line">           <span class="comment">// ...</span></div><div class="line"></div><div class="line"></div><div class="line">           mTargetStack.startActivityLocked(mStartActivity, topFocused, newTask, mKeepCurTransition,</div><div class="line">               mOptions);</div><div class="line"></div><div class="line">           <span class="comment">// ...</span></div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">系统源码分析</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/App的启动过程/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-大图的局部显示：BitmapRegionDecoder" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/大图的局部显示：BitmapRegionDecoder/">大图的局部显示：BitmapRegionDecoder</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/大图的局部显示：BitmapRegionDecoder/" class="archive-article-date">
+  	<time datetime="2017-09-26T02:57:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="需求场景"><a href="#需求场景" class="headerlink" title="需求场景"></a>需求场景</h3><p>有一张大图，比如清明上河图，不想通过压缩的方式显示整张图片，只想显示图片的一部分</p>
+<h3 id="基本步骤"><a href="#基本步骤" class="headerlink" title="基本步骤"></a>基本步骤</h3><h4 id="1-根据neWInstance-获取BitmapRegionDecoder对象"><a href="#1-根据neWInstance-获取BitmapRegionDecoder对象" class="headerlink" title="1.根据neWInstance()获取BitmapRegionDecoder对象"></a>1.根据neWInstance()获取BitmapRegionDecoder对象</h4><p>newInstance有四种，分别从文件，流，byte[],path获取<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 从输入流获取</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BitmapRegionDecoder <span class="title">newInstance</span><span class="params">(InputStream is, <span class="keyword">boolean</span> isShareable)</span>；</span></div><div class="line"><span class="function"></span></div><div class="line"><span class="function"><span class="comment">// 从文件获取</span></span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BitmapRegionDecoder <span class="title">newInstance</span><span class="params">(FileDescriptor fd, <span class="keyword">boolean</span> isShareable)</span></span>; </div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 从path获取</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BitmapRegionDecoder <span class="title">newInstance</span><span class="params">(String pathName,<span class="keyword">boolean</span> isShareable)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">// 从byte[]获取</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BitmapRegionDecoder <span class="title">newInstance</span><span class="params">(<span class="keyword">byte</span>[] data,<span class="keyword">int</span> offset, <span class="keyword">int</span> length, <span class="keyword">boolean</span> isShareable)</span></span></div></pre></td></tr></table></figure></p>
+<p>参数isSharedable的解释：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">* @param isShareable If this is true, then the BitmapRegionDecoder may keep a</div><div class="line">*                    shallow reference to the input. If this is false,</div><div class="line">*                    then the BitmapRegionDecoder will explicitly make a copy of the</div><div class="line">*                    input data, and keep that. Even if sharing is allowed,</div><div class="line">*                    the implementation may still decide to make a deep</div><div class="line">*                    copy of the input data. If an image is progressively encoded,</div><div class="line">*                    allowing sharing may degrade the decoding speed.</div></pre></td></tr></table></figure></p>
+<p>isShared为true的时候，会降低解码速度。</p>
+<h4 id="2-调用decodeRegion获取bitmap对象"><a href="#2-调用decodeRegion获取bitmap对象" class="headerlink" title="2.调用decodeRegion获取bitmap对象"></a>2.调用decodeRegion获取bitmap对象</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// rect:显示的图片的矩形区域</span></div><div class="line"><span class="function"><span class="keyword">public</span> Bitmap <span class="title">decodeRegion</span><span class="params">(Rect rect, BitmapFactory.Options options)</span></span>;</div></pre></td></tr></table></figure>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><p>摘自<a href="http://www.jianshu.com/p/b0e2be9e0f8c" target="_blank" rel="external">http://www.jianshu.com/p/b0e2be9e0f8c</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LargeImageView</span> <span class="keyword">extends</span> <span class="title">View</span> <span class="keyword">implements</span> <span class="title">GestureDetector</span>.<span class="title">OnGestureListener</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"LargeImageView"</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> BitmapRegionDecoder mDecoder;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 绘制的区域</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> Rect mRect = <span class="keyword">new</span> Rect();</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mScaledTouchSlop;</div><div class="line"></div><div class="line">    <span class="comment">// 分别记录上次滑动的坐标</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mLastX = <span class="number">0</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mLastY = <span class="number">0</span>;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 图片的宽度和高度</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mImageWidth, mImageHeight;</div><div class="line">    <span class="keyword">private</span> GestureDetector mGestureDetector;</div><div class="line">    <span class="keyword">private</span> BitmapFactory.Options options;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LargeImageView</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context);</div><div class="line">        init(context, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LargeImageView</span><span class="params">(Context context, @Nullable AttributeSet attrs)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs);</div><div class="line">        init(context, attrs);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LargeImageView</span><span class="params">(Context context, @Nullable AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs, defStyleAttr);</div><div class="line">        init(context, attrs);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">        options = <span class="keyword">new</span> BitmapFactory.Options();</div><div class="line">        options.inPreferredConfig = Bitmap.Config.RGB_565;</div><div class="line"></div><div class="line"></div><div class="line">        mScaledTouchSlop = ViewConfiguration.get(getContext())</div><div class="line">                .getScaledTouchSlop();</div><div class="line">        Log.d(TAG, <span class="string">"sts:"</span> + mScaledTouchSlop);</div><div class="line">        <span class="comment">//初始化手势控制器</span></div><div class="line">        mGestureDetector = <span class="keyword">new</span> GestureDetector(context, <span class="keyword">this</span>);</div><div class="line"></div><div class="line">        <span class="comment">//获取图片的宽高</span></div><div class="line">        InputStream is = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            is = context.getResources().getAssets().open(<span class="string">"timg.jpg"</span>);</div><div class="line">            <span class="comment">//初始化BitmapRegionDecode，并用它来显示图片</span></div><div class="line">            mDecoder = BitmapRegionDecoder</div><div class="line">                    .newInstance(is, <span class="keyword">false</span>);</div><div class="line">            BitmapFactory.Options tmpOptions = <span class="keyword">new</span> BitmapFactory.Options();</div><div class="line">            <span class="comment">// Grab the bounds for the scene dimensions</span></div><div class="line">            tmpOptions.inJustDecodeBounds = <span class="keyword">true</span>;</div><div class="line">            BitmapFactory.decodeStream(is, <span class="keyword">null</span>, tmpOptions);</div><div class="line">            mImageWidth = tmpOptions.outWidth;</div><div class="line">            mImageHeight = tmpOptions.outHeight;</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="keyword">if</span> (is != <span class="keyword">null</span>) &#123;</div><div class="line">                    is.close();</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">        <span class="comment">//把触摸事件交给手势控制器处理</span></div><div class="line">        <span class="keyword">return</span> mGestureDetector.onTouchEvent(event);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onDown</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line">        mLastX = (<span class="keyword">int</span>) e.getRawX();</div><div class="line">        mLastY = (<span class="keyword">int</span>) e.getRawY();</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onShowPress</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onSingleTapUp</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onScroll</span><span class="params">(MotionEvent e1, MotionEvent e2, <span class="keyword">float</span> distanceX, <span class="keyword">float</span> distanceY)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> x = (<span class="keyword">int</span>) e2.getRawX();</div><div class="line">        <span class="keyword">int</span> y = (<span class="keyword">int</span>) e2.getRawY();</div><div class="line">        move(x, y);</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * 移动的时候更新图片显示的区域</span></div><div class="line"><span class="comment">     *</span></div><div class="line"><span class="comment">     * <span class="doctag">@param</span> x</span></div><div class="line"><span class="comment">     * <span class="doctag">@param</span> y</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">move</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> deltaX = x - mLastX;</div><div class="line">        <span class="keyword">int</span> deltaY = y - mLastY;</div><div class="line">        Log.d(TAG, <span class="string">"move, deltaX:"</span> + deltaX + <span class="string">" deltaY:"</span> + deltaY);</div><div class="line">        <span class="comment">//如果图片宽度大于屏幕宽度</span></div><div class="line">        <span class="keyword">if</span> (mImageWidth &gt; getWidth()) &#123;</div><div class="line">            <span class="comment">//移动rect区域</span></div><div class="line">            mRect.offset(-deltaX, <span class="number">0</span>);</div><div class="line">            <span class="comment">//检查是否到达图片最右端</span></div><div class="line">            <span class="keyword">if</span> (mRect.right &gt; mImageWidth) &#123;</div><div class="line">                mRect.right = mImageWidth;</div><div class="line">                mRect.left = mImageWidth - getWidth();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">//检查左端</span></div><div class="line">            <span class="keyword">if</span> (mRect.left &lt; <span class="number">0</span>) &#123;</div><div class="line">                mRect.left = <span class="number">0</span>;</div><div class="line">                mRect.right = getWidth();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            invalidate();</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//如果图片高度大于屏幕高度</span></div><div class="line">        <span class="keyword">if</span> (mImageHeight &gt; getHeight()) &#123;</div><div class="line">            mRect.offset(<span class="number">0</span>, -deltaY);</div><div class="line"></div><div class="line">            <span class="comment">//是否到达最底部</span></div><div class="line">            <span class="keyword">if</span> (mRect.bottom &gt; mImageHeight) &#123;</div><div class="line">                mRect.bottom = mImageHeight;</div><div class="line">                mRect.top = mImageHeight - getHeight();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (mRect.top &lt; <span class="number">0</span>) &#123;</div><div class="line">                mRect.top = <span class="number">0</span>;</div><div class="line">                mRect.bottom = getHeight();</div><div class="line">            &#125;</div><div class="line">            invalidate();</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">        mLastX = x;</div><div class="line">        mLastY = y;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLongPress</span><span class="params">(MotionEvent e)</span> </span>&#123;</div><div class="line">        mLastX = (<span class="keyword">int</span>) e.getRawX();</div><div class="line">        mLastY = (<span class="keyword">int</span>) e.getRawY();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onFling</span><span class="params">(MotionEvent e1, MotionEvent e2, <span class="keyword">float</span> velocityX, <span class="keyword">float</span> velocityY)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> x = (<span class="keyword">int</span>) e2.getRawX();</div><div class="line">        <span class="keyword">int</span> y = (<span class="keyword">int</span>) e2.getRawY();</div><div class="line">        move(x, y);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">        <span class="comment">//显示图片</span></div><div class="line">        Bitmap bm = mDecoder.decodeRegion(mRect, options);</div><div class="line">        canvas.drawBitmap(bm, <span class="number">0</span>, <span class="number">0</span>, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line"></div><div class="line">        <span class="keyword">int</span> width = getMeasuredWidth();</div><div class="line">        <span class="keyword">int</span> height = getMeasuredHeight();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> imageWidth = mImageWidth;</div><div class="line">        <span class="keyword">int</span> imageHeight = mImageHeight;</div><div class="line"></div><div class="line">        <span class="comment">//默认显示图片的中心区域</span></div><div class="line">        mRect.left = imageWidth / <span class="number">2</span> - width / <span class="number">2</span>;</div><div class="line">        mRect.top = imageHeight / <span class="number">2</span> - height / <span class="number">2</span>;</div><div class="line">        mRect.right = mRect.left + width;</div><div class="line">        mRect.bottom = mRect.top + height;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">图片处理</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/大图的局部显示：BitmapRegionDecoder/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Jni数据类型与描述符" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1220,166 +1381,6 @@
 
 
   
-    <article id="post-git的远程操作" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/23/git的远程操作/">git的远程操作</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/23/git的远程操作/" class="archive-article-date">
-  	<time datetime="2017-09-23T12:00:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="git-clone"><a href="#git-clone" class="headerlink" title="git clone"></a>git clone</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">git clone &lt;版本库的网址&gt;</div><div class="line">git clone &lt;版本库的网址&gt; &lt;本地目录名&gt;</div><div class="line"></div><div class="line">//例如：</div><div class="line">git clone https://github.com/jquery/jquery.git</div><div class="line">git clone https://github.com/jquery/jquery.git project_dir</div></pre></td></tr></table></figure>
-<p>git clone支持多种协议，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">//http,https</div><div class="line">$ git clone http[s]://example.com/path/to/repo.git/</div><div class="line"></div><div class="line">//ssh</div><div class="line">$ git clone ssh://example.com/path/to/repo.git/</div><div class="line">//ssh另一种写法：</div><div class="line">$ git clone [user@]example.com:path/to/repo.git/</div><div class="line"></div><div class="line">//git</div><div class="line">$ git clone git://example.com/path/to/repo.git/</div><div class="line"></div><div class="line"></div><div class="line">//本地，可以利用这个做本地实验</div><div class="line">$ git clone file:///opt/git/project.git    </div><div class="line"></div><div class="line">//ftp</div><div class="line">$ git clone ftp[s]://example.com/path/to/repo.git/</div><div class="line"></div><div class="line">//rsync</div><div class="line">$ git clone rsync://example.com/path/to/repo.git/</div></pre></td></tr></table></figure></p>
-<h2 id="git-remote"><a href="#git-remote" class="headerlink" title="git remote"></a>git remote</h2><p>每个远程主机，都需要一个主机名，git remote就是用来管理主机名的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">//列出所有远程主机</div><div class="line">$ git remote</div><div class="line">origin</div><div class="line"></div><div class="line">//列出所有主机及其网址</div><div class="line">$ git remote -v</div><div class="line">origin  git@github.com:jquery/jquery.git (fetch)</div><div class="line">origin  git@github.com:jquery/jquery.git (push)</div><div class="line"></div><div class="line">//克隆的同时指定主机名</div><div class="line">$ git clone -o jQuery https://github.com/jquery/jquery.git</div><div class="line">$ git remote</div><div class="line">jQuery</div><div class="line"></div><div class="line">//查看主机的详细信息</div><div class="line">$ git remote show origin</div><div class="line">* remote origin</div><div class="line">  Fetch URL: file:///home/zjf/maxw/git/remote/project.git</div><div class="line">  Push  URL: file:///home/zjf/maxw/git/remote/project.git</div><div class="line">  HEAD branch: master</div><div class="line">  Remote branch:</div><div class="line">    master tracked</div><div class="line">  Local branch configured for &apos;git pull&apos;:</div><div class="line">    master merges with remote master</div><div class="line">  Local ref configured for &apos;git push&apos;:</div><div class="line">    master pushes to master (up to date)</div><div class="line"></div><div class="line">//修改远程主机名</div><div class="line">$ git remote rename &lt;原主机名&gt; &lt;新主机名&gt;</div><div class="line"></div><div class="line">//添加远程主机</div><div class="line">$ git remote add &lt;主机名&gt; &lt;网址&gt;</div><div class="line"></div><div class="line">//删除远程主机</div><div class="line">$ git remote rm &lt;主机名&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="git-fetch"><a href="#git-fetch" class="headerlink" title="git fetch"></a>git fetch</h2><p>从远程主机取回代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">// 取回远程主机的所有代码更新</div><div class="line">git fetch &lt;远程主机名&gt;</div><div class="line"></div><div class="line">// 取回远程主机某条分支的代码更新</div><div class="line">git fetch &lt;远程主机名&gt; &lt;分支名&gt;</div><div class="line"></div><div class="line">//取回的更新，在本地采用“远程主机名/分支名”的格式查看。</div><div class="line">//例如，将取回的origin主机master分支上的更新合并到当前本地分支</div><div class="line">git merge origin/mater</div><div class="line">//或者</div><div class="line">git rebase origin/master</div></pre></td></tr></table></figure></p>
-<h2 id="git-pull"><a href="#git-pull" class="headerlink" title="git pull"></a>git pull</h2><p>从远程主机取回更新代码，并合入本地。<br>相当于fetch+merge<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">$ git pull &lt;远程主机名&gt; &lt;远程分支名&gt;:&lt;本地分支名&gt;</div><div class="line"></div><div class="line"></div><div class="line">// 完整的,远程主机的next分支到本地master分支：</div><div class="line">$ git pull origin next:master</div><div class="line"></div><div class="line">// 如果和当前分支合并，本地分支名省略：</div><div class="line">$ git pull origin next</div><div class="line"></div><div class="line">$ git pull origin next</div><div class="line">//等于</div><div class="line">$ git fetch origin</div><div class="line">$ git merge origin/next</div><div class="line"></div><div class="line"></div><div class="line">//建立本地分支和远程分支的追踪关系</div><div class="line">$ git branch --set-upstream &lt;本地分支&gt; &lt;远程分支&gt;</div><div class="line">// 例如</div><div class="line">$ git branch --set-upstream master origin/next</div><div class="line"></div><div class="line">//建立追踪关系后，pul时就可以省略分支，直接：</div><div class="line">$ git pull origin</div><div class="line"></div><div class="line"></div><div class="line">//默认的，代码取回后采用merge，如果想采用rebase，可以：</div><div class="line">$ git pull --rebase &lt;远程主机名&gt; &lt;远程分支名&gt;:&lt;本地分支名&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="git-push"><a href="#git-push" class="headerlink" title="git push"></a>git push</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">$ git push &lt;远程主机名&gt; &lt;本地分支名&gt;:&lt;远程分支名&gt;</div><div class="line"></div><div class="line">//完整的：</div><div class="line">$ git push origin master:master</div><div class="line"></div><div class="line">//如果本地分支和远程分支有追踪关系，远程分支名可以省略：</div><div class="line">$ git push origin master</div><div class="line"></div><div class="line">// 如果将本地分支push到远程，但是远程并没有对应的分支，则会自动创建对应的分支。</div><div class="line">git push origin develop //远程没有develop对应的分支，则会自动创建一个对应分支，名字和本地分支一样</div><div class="line"></div><div class="line">git push origin release:release_r //远程没有release_r分支，则会自动创建</div><div class="line"></div><div class="line"></div><div class="line">//若push当前的本地分支，则本地分支名都可以省略</div><div class="line">git push origin</div><div class="line"></div><div class="line">//若只对应一个远程分支，则远程主机名也可以省略</div><div class="line">git push</div></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/23/git的远程操作/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-git的分支管理和版本管理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/23/git的分支管理和版本管理/">git的分支管理和版本管理</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/23/git的分支管理和版本管理/" class="archive-article-date">
-  	<time datetime="2017-09-23T12:00:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">//查看本地分支</div><div class="line">git branch </div><div class="line"></div><div class="line">//查看远程分支</div><div class="line">git branch -r</div><div class="line"></div><div class="line">//查看所有分支</div><div class="line">git branch -a</div><div class="line"></div><div class="line">//从当前分支创建并切换新分支</div><div class="line">git checkout -b &lt;new_branch_name&gt;</div><div class="line"></div><div class="line">//创建分支</div><div class="line">git branch &lt;new_branch_name&gt;</div><div class="line"></div><div class="line">//删除分支</div><div class="line">git branch -d &lt;branch_name&gt;</div><div class="line"></div><div class="line">//删除远程分支</div><div class="line">git branch -d -r &lt;branch_name&gt;</div><div class="line">//例如：</div><div class="line">git branch -d -r origin/branch1</div><div class="line"></div><div class="line">//分支重命名</div><div class="line">git branch -m &lt;old_branch_name&gt; &lt;new_branch_name&gt;</div><div class="line"></div><div class="line"></div><div class="line">//从远程分支创建本地分支</div><div class="line">//可以把远程某各分支拉去到本地的branchname下，//如果没有branchname，则会在本地新建branchname</div><div class="line">git fetch origin &lt;branch_name&gt;:&lt;branch_name&gt;</div><div class="line">git pull origin &lt;branch_name&gt;:&lt;branch_name&gt;</div><div class="line"></div><div class="line">//创建并跳转</div><div class="line">git checkout origin/&lt;branch_name&gt; -b &lt;branch_name&gt;</div><div class="line"></div><div class="line">git branch --track [branch] [remote-branch]</div></pre></td></tr></table></figure>
-<h2 id="git-merge"><a href="#git-merge" class="headerlink" title="git merge"></a>git merge</h2><p>将目标分支合并入当前分支</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// 将&lt;branch_name&gt;分支合入到当前分支</div><div class="line">git merge &lt;branch_name&gt;</div><div class="line"></div><div class="line">// 将远程master分支合并如当前分支</div><div class="line">git merge origin/master</div></pre></td></tr></table></figure>
-<p>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">分支1:a,b,c,d</div><div class="line">分支2:a,b,e,f</div><div class="line">将分支2合并如分支1:</div><div class="line">git chectout 分支1</div><div class="line">git merge 分支2</div><div class="line">合并之后：</div><div class="line">a,b,c,d,e,f,g</div><div class="line">其中g是merge后新生成的提交，称为合并提交。</div><div class="line">e和f是在另一条分叉上，git log --graph可以看清楚:</div><div class="line">a---b---c---d-----------g</div><div class="line">            |---e---f---|</div></pre></td></tr></table></figure></p>
-<h2 id="git-rebase"><a href="#git-rebase" class="headerlink" title="git rebase"></a>git rebase</h2><p>将目标分支合并入当前分支，但是不会产生新的合并节点<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// 将&lt;branch_name&gt;分支合入到当前分支</div><div class="line">git rebase &lt;branch_name&gt;</div><div class="line"></div><div class="line">// 将远程master分支合并如当前分支</div><div class="line">git rebase origin/master</div></pre></td></tr></table></figure></p>
-<p>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">分支1:a,b,c,d</div><div class="line">分支2:a,b,e,f</div><div class="line">将分支2合并如分支1:</div><div class="line">git chectout 分支1</div><div class="line">git rebase 分支2</div><div class="line">合并之后：</div><div class="line">a,b,e,f,c&apos;</div><div class="line">原来的c,d会销毁，c和d的变动都会放在新的提交c&apos;中</div><div class="line">rebase后没有分叉，都是在一条线上，通过git log --graph可以看到：</div><div class="line">a---b---e---f---c&apos;</div></pre></td></tr></table></figure></p>
-<h2 id="git-reset"><a href="#git-reset" class="headerlink" title="git reset"></a>git reset</h2><p>一次完整的修改提交：<br>当前commit信息,三次提交：a—b—c<br>开始以下几步操作：<br>初始(1)—编辑后(2)—git add后(3)—git commit后(4)<br>操作后log内容：<br>a—b—c—d</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//变回a---b---c,git后(3)状态</div><div class="line">git reset --soft HEAD~1</div><div class="line"></div><div class="line">// 变回a---b---c,编辑后(2)状态 （默认模式）</div><div class="line">git reset --mixed HEAD~1</div><div class="line"></div><div class="line">//变回a---b---c,初始(1)状态</div><div class="line">git reset --hard HEAD~1</div></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/23/git的分支管理和版本管理/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1477,19 +1478,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件传递</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">事件传递</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1509,11 +1510,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+                <a href="javascript:void(0)" class="js-tag color5">开源框架</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
               </li>
              
               <li class="article-tag-list-item">
