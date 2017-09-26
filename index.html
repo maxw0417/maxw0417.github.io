@@ -245,6 +245,105 @@
 
 
   
+    <article id="post-android的dex分包技术" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/android的dex分包技术/">android的dex分包技术</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/android的dex分包技术/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:12:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="android-dex分包方案"><a href="#android-dex分包方案" class="headerlink" title="android dex分包方案"></a>android dex分包方案</h2><p>原因：<br>1.一个dex文件最多只支持65526个方法<br>2.插件化，热修复的需要</p>
+<p>原理：<br>除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。</p>
+<h2 id="注入classloader"><a href="#注入classloader" class="headerlink" title="注入classloader"></a>注入classloader</h2><h3 id="PathClassLoader"><a href="#PathClassLoader" class="headerlink" title="PathClassLoader"></a>PathClassLoader</h3><p> Android uses this class for its system class loader and for its application class loader(s),<br> 加载android的系统类，以及应用类，但是只能加载系统apk的文件（即/data/app目录下）的apk文件。</p>
+<h3 id="DexClassLoader"><a href="#DexClassLoader" class="headerlink" title="DexClassLoader"></a>DexClassLoader</h3><p>加载apk，jar，dex等文件。可以用来执行非安装的程序代码。</p>
+<h3 id="BaseDexClassLoader"><a href="#BaseDexClassLoader" class="headerlink" title="BaseDexClassLoader"></a>BaseDexClassLoader</h3><p>是DexCalssLoader和PathClassLoade的父类，在该类中，寻找class的方法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Override  </div><div class="line">protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;  </div><div class="line">    List&lt;Throwable&gt; suppressedExceptions = new ArrayList&lt;Throwable&gt;();  </div><div class="line">    Class c = pathList.findClass(name, suppressedExceptions);  </div><div class="line">    if (c == null) &#123;  </div><div class="line">        ClassNotFoundException cnfe = new ClassNotFoundException(&quot;Didn&apos;t find class \&quot;&quot; + name + &quot;\&quot; on path: &quot; + pathList);  </div><div class="line">        for (Throwable t : suppressedExceptions) &#123;  </div><div class="line">            cnfe.addSuppressed(t);  </div><div class="line">       &#125;  </div><div class="line">        throw cnfe;  </div><div class="line">    &#125;  </div><div class="line">     return c;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>pathList.findClass()在DexPathList中的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Class findClass(String name, List&lt;Throwable&gt; suppressed) &#123;  </div><div class="line">    for (Element element : dexElements) &#123;  </div><div class="line">        DexFile dex = element.dexFile;  </div><div class="line">        if (dex != null) &#123;  </div><div class="line">            Class clazz = dex.loadClassBinaryName(name, definingContext, suppressed);  </div><div class="line">            if (clazz != null) &#123;  </div><div class="line">                return clazz;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">   &#125;  </div><div class="line">    if (dexElementsSuppressedExceptions != null) &#123;  </div><div class="line">        suppressed.addAll(Arrays.asList(dexElementsSuppressedExceptions));  </div><div class="line">    &#125;  </div><div class="line">    return null;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>加入我们将第二个dex中的class文件也放入dexelements数组中，那就应该可以加载第二个dex中的类了。</p>
+<p>在自定义的application的onCreate()中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">//参数libpath是第二个dex的文件信息，包含完整路径，在assets目录下。</div><div class="line">public String inject(String libPath) &#123;  </div><div class="line">    boolean hasBaseDexClassLoader = true;  </div><div class="line">    try &#123;  </div><div class="line">        Class.forName(&quot;dalvik.system.BaseDexClassLoader&quot;);  </div><div class="line">    &#125; catch (ClassNotFoundException e) &#123;  </div><div class="line">        hasBaseDexClassLoader = false;  </div><div class="line">    &#125;  </div><div class="line">    if (hasBaseDexClassLoader) &#123;  </div><div class="line">        PathClassLoader pathClassLoader = (PathClassLoader)sApplication.getClassLoader();  </div><div class="line">        DexClassLoader dexClassLoader = new DexClassLoader(libPath, sApplication.getDir(&quot;dex&quot;, 0).getAbsolutePath(), libPath, sApplication.getClassLoader());  </div><div class="line">        try &#123;  </div><div class="line">            Object dexElements = combineArray(getDexElements(getPathList(pathClassLoader)), getDexElements(getPathList(dexClassLoader)));  </div><div class="line">            Object pathList = getPathList(pathClassLoader);  </div><div class="line">            setField(pathList, pathList.getClass(), &quot;dexElements&quot;, dexElements);  </div><div class="line">            return &quot;SUCCESS&quot;;  </div><div class="line">        &#125; catch (Throwable e) &#123;  </div><div class="line">            e.printStackTrace();  </div><div class="line">            return android.util.Log.getStackTraceString(e);  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    return &quot;SUCCESS&quot;;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>将PathClassLoader中的elements和DexClassLoader中的elements合并，将合并后的elements注入到PathClassLoader中，就完成了。</p>
+<p>注意点：</p>
+<p>1.由于在application的onCreate中动态注入，所以第二个dex包不宜过大，否则会拖慢启动速度。</p>
+<p>2.由于低一点，一般将分包技术和插件技术结合使用，核心功能采用分包技术，非核心功能采用插件技术。</p>
+<p>3.如果不同的dex中有相同的class，则优先选择排在前面的dex中的class</p>
+<h2 id="阻止相关类打上CLASS-ISPREVERIFIED标志"><a href="#阻止相关类打上CLASS-ISPREVERIFIED标志" class="headerlink" title="阻止相关类打上CLASS_ISPREVERIFIED标志"></a>阻止相关类打上CLASS_ISPREVERIFIED标志</h2><h3 id="如何修改一个类的class文件"><a href="#如何修改一个类的class文件" class="headerlink" title="如何修改一个类的class文件"></a>如何修改一个类的class文件</h3><p>使用字节码处理工具javassist.</p>
+<p>提前准备的几个类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">package dodola.hackdex;</div><div class="line">public class AntilazyLoad</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class BugClass</div><div class="line">&#123;</div><div class="line">    public String bug()</div><div class="line">    &#123;</div><div class="line">        return &quot;bug class&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class LoadBugClass</div><div class="line">&#123;</div><div class="line">    public String getBugString()</div><div class="line">    &#123;</div><div class="line">        BugClass bugClass = new BugClass();</div><div class="line">        return bugClass.bug();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>插入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">package test;</div><div class="line"></div><div class="line">import javassist.ClassPool;</div><div class="line">import javassist.CtClass;</div><div class="line">import javassist.CtConstructor;</div><div class="line"></div><div class="line">public class InjectHack</div><div class="line">&#123;</div><div class="line">    public static void main(String[] args)</div><div class="line">    &#123;</div><div class="line">        try</div><div class="line">        &#123;</div><div class="line">            String path = &quot;/Users/zhy/develop_work/eclipse_android/imooc/JavassistTest/&quot;;</div><div class="line">            ClassPool classes = ClassPool.getDefault();</div><div class="line">            classes.appendClassPath(path + &quot;bin&quot;);//项目的bin目录即可</div><div class="line">            CtClass c = classes.get(&quot;dodola.hotfix.LoadBugClass&quot;);</div><div class="line">            CtConstructor ctConstructor = c.getConstructors()[0];</div><div class="line">            ctConstructor</div><div class="line">                    .insertAfter(&quot;System.out.println(dodola.hackdex.AntilazyLoad.class);&quot;);</div><div class="line">            c.writeFile(path + &quot;/output&quot;);</div><div class="line">        &#125; catch (Exception e)</div><div class="line">        &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="如何在dx之前去执行以上的操作"><a href="#如何在dx之前去执行以上的操作" class="headerlink" title="如何在dx之前去执行以上的操作"></a>如何在dx之前去执行以上的操作</h3><p>修改app/build_gradle<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">apply plugin: &apos;com.android.application&apos;</div><div class="line"></div><div class="line">task(&apos;processWithJavassist&apos;) &lt;&lt; &#123;</div><div class="line">    String classPath = file(&apos;build/intermediates/classes/debug&apos;)//项目编译class所在目录</div><div class="line">    dodola.patch.PatchClass.process(classPath, project(&apos;:hackdex&apos;).buildDir</div><div class="line">            .absolutePath + &apos;/intermediates/classes/debug&apos;)//第二个参数是hackdex的class所在目录</div><div class="line"></div><div class="line">&#125;</div><div class="line">android &#123;</div><div class="line">    applicationVariants.all &#123; variant -&gt;</div><div class="line">        variant.dex.dependsOn &lt;&lt; processWithJavassist //在执行dx命令之前将代码打入到class中</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="将class文件打包成独立的jar包"><a href="#将class文件打包成独立的jar包" class="headerlink" title="将class文件打包成独立的jar包"></a>将class文件打包成独立的jar包</h3><p>注意不是普通的jar包，是要经过dx工具转换的jar包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jar cvf hack.jar dodola/hackdex/*</div><div class="line">dx  --dex --output hack_dex.jar hack.jar</div></pre></td></tr></table></figure></p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>1.动态加载多个dex中的类</p>
+<p>2.由于dex中有可能有相同的类，此时，先加载的dex中的那个类生效。</p>
+<p>3.因为第2点，只要将修复问题的那个类放在一个dex中，并奖这个dex放在最先加载，即可修复那个有问题的类</p>
+<p>4.CLASS_ISPREVERIFIED问题的解决方法。<br>引起整个问题的原因是，在某个类的static，privage，构造函数等方法中，直接引用的所有类都和该类在同一个dex中，那么该类就会被打上CLASS_ISPREVERIFIED记号，引起问题。修改办法是，所有类的构造方法都加上一句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public 构造函数&#123;</div><div class="line">    System.out.println(Test.class);    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>并将Test.class单独放在一个dex中</p>
+<p>5.那新的用于修复bug的dex如何被动态加载呢？可以预留下载接口，查询接口是否有新的dex，如果有，下载到sd卡上，然后再动态加载它。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://www.jianshu.com/p/353514d315a7" target="_blank" rel="external">Android插件化从入门到放弃-最强合集</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">热修复</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/android的dex分包技术/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Anroid-触摸事件传递机制总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -956,216 +1055,6 @@
 
 
   
-    <article id="post-Jni数据类型与描述符" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/25/Jni数据类型与描述符/">Jni数据类型与描述符</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/25/Jni数据类型与描述符/" class="archive-article-date">
-  	<time datetime="2017-09-25T05:54:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h2><table>
-<thead>
-<tr>
-<th>java type</th>
-<th>jni type</th>
-<th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>boolean</td>
-<td>jboolean</td>
-<td>unsigned 8 bits</td>
-</tr>
-<tr>
-<td>byte</td>
-<td>jbyte</td>
-<td>signed 8 bits</td>
-</tr>
-<tr>
-<td>char</td>
-<td>jchar</td>
-<td>unsigned 16 bits</td>
-</tr>
-<tr>
-<td>shot</td>
-<td>jshort</td>
-<td>signed 16 bits</td>
-</tr>
-<tr>
-<td>int</td>
-<td>jint</td>
-<td>signed 32 bits</td>
-</tr>
-<tr>
-<td>long</td>
-<td>jlong</td>
-<td>signed 64bits</td>
-</tr>
-<tr>
-<td>float</td>
-<td>jfloat</td>
-<td>32 bits</td>
-</tr>
-<tr>
-<td>double</td>
-<td>jdouble</td>
-<td>64 bits</td>
-</tr>
-<tr>
-<td>void</td>
-<td>void</td>
-<td>N/A</td>
-</tr>
-</tbody>
-</table>
-<h2 id="引用数据类型"><a href="#引用数据类型" class="headerlink" title="引用数据类型"></a>引用数据类型</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jobject                         (all Java objects)</div><div class="line">|</div><div class="line">|-- jclass                      (java.lang.Class objects)</div><div class="line">|-- jstring                     (java.lang.String objects)</div><div class="line">|-- jarray                      (array)</div><div class="line">|      |--jobjectArray          (object arrays)</div><div class="line">|      |--jbooleanArray         (boolean arrays)</div><div class="line">|      |--jbyteArray            (byte arrays)</div><div class="line">|      |--jcharArray            (char arrays)</div><div class="line">|      |--jshortArray           (short arrays)</div><div class="line">|      |--jintArray             (int arrays)</div><div class="line">|     |--jlongArray             (long arrays)</div><div class="line">|      |--jfloatArray           (float arrays)</div><div class="line">|      |--jdoubleArray          (double arrays)</div><div class="line">|</div><div class="line">|--jthrowable</div></pre></td></tr></table></figure>
-<h2 id="方法和变量ID"><a href="#方法和变量ID" class="headerlink" title="方法和变量ID"></a>方法和变量ID</h2><p>当需要调用Java中的某个方法的时候我们首先要获取它的ID，根据ID调用JNI函数获取该方法，变量的获取过程也是同样的过程，这些ID的结构体定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">struct _jfieldID;              /* opaque structure */ </div><div class="line">typedef struct _jfieldID *jfieldID;   /* field IDs */ </div><div class="line"></div><div class="line">struct _jmethodID;              /* opaque structure */ </div><div class="line">typedef struct _jmethodID *jmethodID; /* method IDs */</div></pre></td></tr></table></figure></p>
-<h2 id="描述符"><a href="#描述符" class="headerlink" title="描述符"></a>描述符</h2><h3 id="类描述符"><a href="#类描述符" class="headerlink" title="类描述符"></a>类描述符</h3><p>举个例子,一个java类com.github.songnick.jni.AndroidJni，它的类描述符为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">com/github/songnick/jni/AndroidJni</div></pre></td></tr></table></figure></p>
-<p>即把.换成/</p>
-<h3 id="方法描述符"><a href="#方法描述符" class="headerlink" title="方法描述符"></a>方法描述符</h3><p>用来确定native方法的参数和返回值。<br>不多解释，直接看例子就懂：</p>
-<table>
-<thead>
-<tr>
-<th>描述符</th>
-<th>java方法</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>“()Ljava/lang/String;”</td>
-<td>String f()</td>
-</tr>
-<tr>
-<td>“(ILjava/lang/Class;)J”</td>
-<td>long f(int i, Class c);</td>
-</tr>
-</tbody>
-</table>
-<p>括号内的是参数的数据类型描述符；</p>
-<p>括号后的湿返回值的数据类型描述符；</p>
-<h3 id="数据类型描述符"><a href="#数据类型描述符" class="headerlink" title="数据类型描述符"></a>数据类型描述符</h3><table>
-<thead>
-<tr>
-<th>描述符</th>
-<th>数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Z</td>
-<td>boolean</td>
-</tr>
-<tr>
-<td>B</td>
-<td>byte</td>
-</tr>
-<tr>
-<td>C</td>
-<td>short</td>
-</tr>
-<tr>
-<td>S</td>
-<td>char</td>
-</tr>
-<tr>
-<td>I</td>
-<td>int</td>
-</tr>
-<tr>
-<td>J</td>
-<td>long</td>
-</tr>
-<tr>
-<td>F</td>
-<td>float</td>
-</tr>
-<tr>
-<td>D</td>
-<td>double</td>
-</tr>
-<tr>
-<td>V</td>
-<td>void</td>
-</tr>
-<tr>
-<td>“Ljava/lang/String;”</td>
-<td>String</td>
-</tr>
-<tr>
-<td>“[Ljava/lang/Object;”</td>
-<td>Object[]</td>
-</tr>
-</tbody>
-</table>
-<p>引用型数据类型以L开头，以；结尾。</p>
-<p>数组用[表示，二维数组就是[[，三维数组[[[</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/25/Jni数据类型与描述符/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1263,19 +1152,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
+                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1283,7 +1164,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1291,7 +1180,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
+                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1304,10 +1201,6 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">

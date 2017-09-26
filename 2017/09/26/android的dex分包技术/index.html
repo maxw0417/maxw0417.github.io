@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>使用android studio开发jni | 米兰的小铁铺</title>
+  <title>android的dex分包技术 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
-<meta name="keywords" content="Jni">
+  <meta name="description" content="android dex分包方案原因：1.一个dex文件最多只支持65526个方法2.插件化，热修复的需要 原理：除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。 注入classloaderPathClassLoader Android uses this class for its syst">
+<meta name="keywords" content="热修复">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用android studio开发jni">
-<meta property="og:url" content="http://yoursite.com/2017/09/26/使用android-studio开发jni/index.html">
+<meta property="og:title" content="android的dex分包技术">
+<meta property="og:url" content="http://yoursite.com/2017/09/26/android的dex分包技术/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
-<meta property="og:description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
-<meta property="og:updated_time" content="2017-09-26T11:03:35.000Z">
+<meta property="og:description" content="android dex分包方案原因：1.一个dex文件最多只支持65526个方法2.插件化，热修复的需要 原理：除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。 注入classloaderPathClassLoader Android uses this class for its syst">
+<meta property="og:updated_time" content="2017-09-26T11:14:53.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用android studio开发jni">
-<meta name="twitter:description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
+<meta name="twitter:title" content="android的dex分包技术">
+<meta name="twitter:description" content="android dex分包方案原因：1.一个dex文件最多只支持65526个方法2.插件化，热修复的需要 原理：除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。 注入classloaderPathClassLoader Android uses this class for its syst">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -162,57 +162,52 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-使用android-studio开发jni" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-android的dex分包技术" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      使用android studio开发jni
+      android的dex分包技术
     </h1>
   
 
         
-        <a href="/2017/09/26/使用android-studio开发jni/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+        <a href="/2017/09/26/android的dex分包技术/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:12:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><p>1.Android Studio设置命令行快捷操作</p>
-<p>2.新建jni目录</p>
-<p>3.修改module下的build.gradle文件</p>
-<p>4.修改project下的gradle.properties文件</p>
-<p>5.编写java类</p>
-<p>6.创建头文件</p>
-<p>7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件</p>
-<p>8.执行ndk-build，生成so库文件</p>
-<p>9.运行app</p>
-<h2 id="Android-Studio设置命令行快捷操作"><a href="#Android-Studio设置命令行快捷操作" class="headerlink" title="Android Studio设置命令行快捷操作"></a>Android Studio设置命令行快捷操作</h2><p>打开Preferences，选择External Tools</p>
-<h3 id="添加javah"><a href="#添加javah" class="headerlink" title="添加javah"></a>添加javah</h3><p>program:$JDKPath$/bin/javah</p>
-<p>paramters:-classpath $Classpath$ -v -jni $FileClass$</p>
-<p>Working directory:$SourcepathEntry$/../jni</p>
-<h3 id="添加ndk-build"><a href="#添加ndk-build" class="headerlink" title="添加ndk-build"></a>添加ndk-build</h3><p>program:/home/zjf/tools/ndk/ndk-build</p>
-<p>paramters:</p>
-<p>Working directory:$ProjectFileDir$/app/src/main</p>
-<h3 id="添加ndk-build-clean"><a href="#添加ndk-build-clean" class="headerlink" title="添加ndk-build clean"></a>添加ndk-build clean</h3><p>program:/home/zjf/tools/ndk/ndk-build</p>
-<p>paramters:clean</p>
-<p>Working directory:$ProjectFileDir$/app/src/main</p>
-<h2 id="新建jni目录"><a href="#新建jni目录" class="headerlink" title="新建jni目录"></a>新建jni目录</h2><p>右击app—NEW—Folder—Jni Folder</p>
-<p>生成的jni目录位置：AndroidStudioProjects/JniDemo/app/src/main/jni</p>
-<h2 id="修改module下的build-gradle文件"><a href="#修改module下的build-gradle文件" class="headerlink" title="修改module下的build.gradle文件"></a>修改module下的build.gradle文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ndk&#123;</div><div class="line">    moduleName &quot;JniDemo&quot;</div><div class="line">&#125;</div><div class="line">sourceSets.main&#123;</div><div class="line">    jni.srcDirs = []</div><div class="line">    jniLibs.srcDir &quot;src/main/libs&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="修改project下的gradle-properties文件"><a href="#修改project下的gradle-properties文件" class="headerlink" title="修改project下的gradle.properties文件"></a>修改project下的gradle.properties文件</h2><p>如果没有这个文件，新建一个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">android.useDeprecatedNdk=true</div></pre></td></tr></table></figure></p>
-<h2 id="编写java类"><a href="#编写java类" class="headerlink" title="编写java类"></a>编写java类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class JniInterface &#123;</div><div class="line"></div><div class="line">    static &#123;</div><div class="line">        System.loadLibrary(&quot;jnidemo&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public native String setAndGetString(String str);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="创建头文件"><a href="#创建头文件" class="headerlink" title="创建头文件"></a>创建头文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">右击JniInterface.java---External tools---javah</div></pre></td></tr></table></figure>
-<p>生成如下文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/AndroidStudioProjects/JniDemo/app/src/main/jni/com_maxw_jnidemo_jni_JniInterface.h</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#include &lt;jni.h&gt;</div><div class="line"></div><div class="line">#ifndef _Included_com_maxw_jnidemo_jni_JniInterface</div><div class="line">#define _Included_com_maxw_jnidemo_jni_JniInterface</div><div class="line">#ifdef __cplusplus</div><div class="line">extern &quot;C&quot; &#123;</div><div class="line">#endif</div><div class="line"></div><div class="line">JNIEXPORT void JNICALL Java_com_maxw_jnidemo_jni_JniInterface_setString</div><div class="line">  (JNIEnv *, jobject, jstring);</div><div class="line"></div><div class="line">#ifdef __cplusplus</div><div class="line">&#125;</div><div class="line">#endif</div><div class="line">#endif</div></pre></td></tr></table></figure>
-<h2 id="在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件"><a href="#在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件" class="headerlink" title="在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件"></a>在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件</h2><p>Android.mk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">LOCAL_PATH := $(call my-dir)</div><div class="line"></div><div class="line">include $(CLEAR_VARS)</div><div class="line"></div><div class="line">LOCAL_MODULE := JniDemo</div><div class="line">LOCAL_SRC_FILES =: JniInterface.cpp</div><div class="line">include $(BUILD_SHARED_LIBRARY)</div></pre></td></tr></table></figure></p>
-<p>Application.mk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">APP_MODULES := JniDemo</div><div class="line">APP_ABI := all</div></pre></td></tr></table></figure></p>
-<h2 id="执行ndk-build，生成so库文件"><a href="#执行ndk-build，生成so库文件" class="headerlink" title="执行ndk-build，生成so库文件"></a>执行ndk-build，生成so库文件</h2><p>右击jni目录—External tools—ndk-build</p>
-<h2 id="运行app"><a href="#运行app" class="headerlink" title="运行app"></a>运行app</h2><p>略</p>
+        <h2 id="android-dex分包方案"><a href="#android-dex分包方案" class="headerlink" title="android dex分包方案"></a>android dex分包方案</h2><p>原因：<br>1.一个dex文件最多只支持65526个方法<br>2.插件化，热修复的需要</p>
+<p>原理：<br>除了第一个dex文件，其他dex文件都以资源的方式放在安装包中，并在application的oncreate()方法中注入到系统的classloader中。</p>
+<h2 id="注入classloader"><a href="#注入classloader" class="headerlink" title="注入classloader"></a>注入classloader</h2><h3 id="PathClassLoader"><a href="#PathClassLoader" class="headerlink" title="PathClassLoader"></a>PathClassLoader</h3><p> Android uses this class for its system class loader and for its application class loader(s),<br> 加载android的系统类，以及应用类，但是只能加载系统apk的文件（即/data/app目录下）的apk文件。</p>
+<h3 id="DexClassLoader"><a href="#DexClassLoader" class="headerlink" title="DexClassLoader"></a>DexClassLoader</h3><p>加载apk，jar，dex等文件。可以用来执行非安装的程序代码。</p>
+<h3 id="BaseDexClassLoader"><a href="#BaseDexClassLoader" class="headerlink" title="BaseDexClassLoader"></a>BaseDexClassLoader</h3><p>是DexCalssLoader和PathClassLoade的父类，在该类中，寻找class的方法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Override  </div><div class="line">protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;  </div><div class="line">    List&lt;Throwable&gt; suppressedExceptions = new ArrayList&lt;Throwable&gt;();  </div><div class="line">    Class c = pathList.findClass(name, suppressedExceptions);  </div><div class="line">    if (c == null) &#123;  </div><div class="line">        ClassNotFoundException cnfe = new ClassNotFoundException(&quot;Didn&apos;t find class \&quot;&quot; + name + &quot;\&quot; on path: &quot; + pathList);  </div><div class="line">        for (Throwable t : suppressedExceptions) &#123;  </div><div class="line">            cnfe.addSuppressed(t);  </div><div class="line">       &#125;  </div><div class="line">        throw cnfe;  </div><div class="line">    &#125;  </div><div class="line">     return c;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>pathList.findClass()在DexPathList中的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Class findClass(String name, List&lt;Throwable&gt; suppressed) &#123;  </div><div class="line">    for (Element element : dexElements) &#123;  </div><div class="line">        DexFile dex = element.dexFile;  </div><div class="line">        if (dex != null) &#123;  </div><div class="line">            Class clazz = dex.loadClassBinaryName(name, definingContext, suppressed);  </div><div class="line">            if (clazz != null) &#123;  </div><div class="line">                return clazz;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">   &#125;  </div><div class="line">    if (dexElementsSuppressedExceptions != null) &#123;  </div><div class="line">        suppressed.addAll(Arrays.asList(dexElementsSuppressedExceptions));  </div><div class="line">    &#125;  </div><div class="line">    return null;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>加入我们将第二个dex中的class文件也放入dexelements数组中，那就应该可以加载第二个dex中的类了。</p>
+<p>在自定义的application的onCreate()中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">//参数libpath是第二个dex的文件信息，包含完整路径，在assets目录下。</div><div class="line">public String inject(String libPath) &#123;  </div><div class="line">    boolean hasBaseDexClassLoader = true;  </div><div class="line">    try &#123;  </div><div class="line">        Class.forName(&quot;dalvik.system.BaseDexClassLoader&quot;);  </div><div class="line">    &#125; catch (ClassNotFoundException e) &#123;  </div><div class="line">        hasBaseDexClassLoader = false;  </div><div class="line">    &#125;  </div><div class="line">    if (hasBaseDexClassLoader) &#123;  </div><div class="line">        PathClassLoader pathClassLoader = (PathClassLoader)sApplication.getClassLoader();  </div><div class="line">        DexClassLoader dexClassLoader = new DexClassLoader(libPath, sApplication.getDir(&quot;dex&quot;, 0).getAbsolutePath(), libPath, sApplication.getClassLoader());  </div><div class="line">        try &#123;  </div><div class="line">            Object dexElements = combineArray(getDexElements(getPathList(pathClassLoader)), getDexElements(getPathList(dexClassLoader)));  </div><div class="line">            Object pathList = getPathList(pathClassLoader);  </div><div class="line">            setField(pathList, pathList.getClass(), &quot;dexElements&quot;, dexElements);  </div><div class="line">            return &quot;SUCCESS&quot;;  </div><div class="line">        &#125; catch (Throwable e) &#123;  </div><div class="line">            e.printStackTrace();  </div><div class="line">            return android.util.Log.getStackTraceString(e);  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    return &quot;SUCCESS&quot;;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>将PathClassLoader中的elements和DexClassLoader中的elements合并，将合并后的elements注入到PathClassLoader中，就完成了。</p>
+<p>注意点：</p>
+<p>1.由于在application的onCreate中动态注入，所以第二个dex包不宜过大，否则会拖慢启动速度。</p>
+<p>2.由于低一点，一般将分包技术和插件技术结合使用，核心功能采用分包技术，非核心功能采用插件技术。</p>
+<p>3.如果不同的dex中有相同的class，则优先选择排在前面的dex中的class</p>
+<h2 id="阻止相关类打上CLASS-ISPREVERIFIED标志"><a href="#阻止相关类打上CLASS-ISPREVERIFIED标志" class="headerlink" title="阻止相关类打上CLASS_ISPREVERIFIED标志"></a>阻止相关类打上CLASS_ISPREVERIFIED标志</h2><h3 id="如何修改一个类的class文件"><a href="#如何修改一个类的class文件" class="headerlink" title="如何修改一个类的class文件"></a>如何修改一个类的class文件</h3><p>使用字节码处理工具javassist.</p>
+<p>提前准备的几个类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">package dodola.hackdex;</div><div class="line">public class AntilazyLoad</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class BugClass</div><div class="line">&#123;</div><div class="line">    public String bug()</div><div class="line">    &#123;</div><div class="line">        return &quot;bug class&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">package dodola.hotfix;</div><div class="line">public class LoadBugClass</div><div class="line">&#123;</div><div class="line">    public String getBugString()</div><div class="line">    &#123;</div><div class="line">        BugClass bugClass = new BugClass();</div><div class="line">        return bugClass.bug();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>插入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">package test;</div><div class="line"></div><div class="line">import javassist.ClassPool;</div><div class="line">import javassist.CtClass;</div><div class="line">import javassist.CtConstructor;</div><div class="line"></div><div class="line">public class InjectHack</div><div class="line">&#123;</div><div class="line">    public static void main(String[] args)</div><div class="line">    &#123;</div><div class="line">        try</div><div class="line">        &#123;</div><div class="line">            String path = &quot;/Users/zhy/develop_work/eclipse_android/imooc/JavassistTest/&quot;;</div><div class="line">            ClassPool classes = ClassPool.getDefault();</div><div class="line">            classes.appendClassPath(path + &quot;bin&quot;);//项目的bin目录即可</div><div class="line">            CtClass c = classes.get(&quot;dodola.hotfix.LoadBugClass&quot;);</div><div class="line">            CtConstructor ctConstructor = c.getConstructors()[0];</div><div class="line">            ctConstructor</div><div class="line">                    .insertAfter(&quot;System.out.println(dodola.hackdex.AntilazyLoad.class);&quot;);</div><div class="line">            c.writeFile(path + &quot;/output&quot;);</div><div class="line">        &#125; catch (Exception e)</div><div class="line">        &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="如何在dx之前去执行以上的操作"><a href="#如何在dx之前去执行以上的操作" class="headerlink" title="如何在dx之前去执行以上的操作"></a>如何在dx之前去执行以上的操作</h3><p>修改app/build_gradle<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">apply plugin: &apos;com.android.application&apos;</div><div class="line"></div><div class="line">task(&apos;processWithJavassist&apos;) &lt;&lt; &#123;</div><div class="line">    String classPath = file(&apos;build/intermediates/classes/debug&apos;)//项目编译class所在目录</div><div class="line">    dodola.patch.PatchClass.process(classPath, project(&apos;:hackdex&apos;).buildDir</div><div class="line">            .absolutePath + &apos;/intermediates/classes/debug&apos;)//第二个参数是hackdex的class所在目录</div><div class="line"></div><div class="line">&#125;</div><div class="line">android &#123;</div><div class="line">    applicationVariants.all &#123; variant -&gt;</div><div class="line">        variant.dex.dependsOn &lt;&lt; processWithJavassist //在执行dx命令之前将代码打入到class中</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="将class文件打包成独立的jar包"><a href="#将class文件打包成独立的jar包" class="headerlink" title="将class文件打包成独立的jar包"></a>将class文件打包成独立的jar包</h3><p>注意不是普通的jar包，是要经过dx工具转换的jar包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jar cvf hack.jar dodola/hackdex/*</div><div class="line">dx  --dex --output hack_dex.jar hack.jar</div></pre></td></tr></table></figure></p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>1.动态加载多个dex中的类</p>
+<p>2.由于dex中有可能有相同的类，此时，先加载的dex中的那个类生效。</p>
+<p>3.因为第2点，只要将修复问题的那个类放在一个dex中，并奖这个dex放在最先加载，即可修复那个有问题的类</p>
+<p>4.CLASS_ISPREVERIFIED问题的解决方法。<br>引起整个问题的原因是，在某个类的static，privage，构造函数等方法中，直接引用的所有类都和该类在同一个dex中，那么该类就会被打上CLASS_ISPREVERIFIED记号，引起问题。修改办法是，所有类的构造方法都加上一句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public 构造函数&#123;</div><div class="line">    System.out.println(Test.class);    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>并将Test.class单独放在一个dex中</p>
+<p>5.那新的用于修复bug的dex如何被动态加载呢？可以预留下载接口，查询接口是否有新的dex，如果有，下载到sd卡上，然后再动态加载它。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://www.jianshu.com/p/353514d315a7" target="_blank" rel="external">Android插件化从入门到放弃-最强合集</a></p>
 
       
 
@@ -247,7 +242,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">热修复</a>
         		</li>
       		
 		</ul>
@@ -303,7 +298,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/使用android-studio开发jni/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/android的dex分包技术/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -317,18 +312,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/09/26/Anroid-触摸事件传递机制总结/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/09/26/jni常用函数用法示例/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Anroid 触摸事件传递机制总结
+          jni常用函数用法示例
         
       </div>
     </a>
   
   
-    <a href="/2017/09/26/jni使用的基本步骤/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">jni使用的基本步骤</div>
+    <a href="/2017/09/26/Anroid-触摸事件传递机制总结/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Anroid 触摸事件传递机制总结</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -355,7 +350,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#主要步骤"><span class="toc-number">1.</span> <span class="toc-text">主要步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android-Studio设置命令行快捷操作"><span class="toc-number">2.</span> <span class="toc-text">Android Studio设置命令行快捷操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#添加javah"><span class="toc-number">2.1.</span> <span class="toc-text">添加javah</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加ndk-build"><span class="toc-number">2.2.</span> <span class="toc-text">添加ndk-build</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加ndk-build-clean"><span class="toc-number">2.3.</span> <span class="toc-text">添加ndk-build clean</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建jni目录"><span class="toc-number">3.</span> <span class="toc-text">新建jni目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改module下的build-gradle文件"><span class="toc-number">4.</span> <span class="toc-text">修改module下的build.gradle文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改project下的gradle-properties文件"><span class="toc-number">5.</span> <span class="toc-text">修改project下的gradle.properties文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写java类"><span class="toc-number">6.</span> <span class="toc-text">编写java类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建头文件"><span class="toc-number">7.</span> <span class="toc-text">创建头文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件"><span class="toc-number">8.</span> <span class="toc-text">在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#执行ndk-build，生成so库文件"><span class="toc-number">9.</span> <span class="toc-text">执行ndk-build，生成so库文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行app"><span class="toc-number">10.</span> <span class="toc-text">运行app</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#android-dex分包方案"><span class="toc-number">1.</span> <span class="toc-text">android dex分包方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注入classloader"><span class="toc-number">2.</span> <span class="toc-text">注入classloader</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PathClassLoader"><span class="toc-number">2.1.</span> <span class="toc-text">PathClassLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DexClassLoader"><span class="toc-number">2.2.</span> <span class="toc-text">DexClassLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BaseDexClassLoader"><span class="toc-number">2.3.</span> <span class="toc-text">BaseDexClassLoader</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#阻止相关类打上CLASS-ISPREVERIFIED标志"><span class="toc-number">3.</span> <span class="toc-text">阻止相关类打上CLASS_ISPREVERIFIED标志</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如何修改一个类的class文件"><span class="toc-number">3.1.</span> <span class="toc-text">如何修改一个类的class文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何在dx之前去执行以上的操作"><span class="toc-number">3.2.</span> <span class="toc-text">如何在dx之前去执行以上的操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将class文件打包成独立的jar包"><span class="toc-number">3.3.</span> <span class="toc-text">将class文件打包成独立的jar包</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结："><span class="toc-number">4.</span> <span class="toc-text">总结：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考资料"><span class="toc-number">4.1.</span> <span class="toc-text">参考资料</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>

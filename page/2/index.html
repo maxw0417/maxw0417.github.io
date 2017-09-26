@@ -159,6 +159,216 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Jni数据类型与描述符" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/25/Jni数据类型与描述符/">Jni数据类型与描述符</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/25/Jni数据类型与描述符/" class="archive-article-date">
+  	<time datetime="2017-09-25T05:54:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h2><table>
+<thead>
+<tr>
+<th>java type</th>
+<th>jni type</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>jboolean</td>
+<td>unsigned 8 bits</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>jbyte</td>
+<td>signed 8 bits</td>
+</tr>
+<tr>
+<td>char</td>
+<td>jchar</td>
+<td>unsigned 16 bits</td>
+</tr>
+<tr>
+<td>shot</td>
+<td>jshort</td>
+<td>signed 16 bits</td>
+</tr>
+<tr>
+<td>int</td>
+<td>jint</td>
+<td>signed 32 bits</td>
+</tr>
+<tr>
+<td>long</td>
+<td>jlong</td>
+<td>signed 64bits</td>
+</tr>
+<tr>
+<td>float</td>
+<td>jfloat</td>
+<td>32 bits</td>
+</tr>
+<tr>
+<td>double</td>
+<td>jdouble</td>
+<td>64 bits</td>
+</tr>
+<tr>
+<td>void</td>
+<td>void</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h2 id="引用数据类型"><a href="#引用数据类型" class="headerlink" title="引用数据类型"></a>引用数据类型</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">jobject                         (all Java objects)</div><div class="line">|</div><div class="line">|-- jclass                      (java.lang.Class objects)</div><div class="line">|-- jstring                     (java.lang.String objects)</div><div class="line">|-- jarray                      (array)</div><div class="line">|      |--jobjectArray          (object arrays)</div><div class="line">|      |--jbooleanArray         (boolean arrays)</div><div class="line">|      |--jbyteArray            (byte arrays)</div><div class="line">|      |--jcharArray            (char arrays)</div><div class="line">|      |--jshortArray           (short arrays)</div><div class="line">|      |--jintArray             (int arrays)</div><div class="line">|     |--jlongArray             (long arrays)</div><div class="line">|      |--jfloatArray           (float arrays)</div><div class="line">|      |--jdoubleArray          (double arrays)</div><div class="line">|</div><div class="line">|--jthrowable</div></pre></td></tr></table></figure>
+<h2 id="方法和变量ID"><a href="#方法和变量ID" class="headerlink" title="方法和变量ID"></a>方法和变量ID</h2><p>当需要调用Java中的某个方法的时候我们首先要获取它的ID，根据ID调用JNI函数获取该方法，变量的获取过程也是同样的过程，这些ID的结构体定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">struct _jfieldID;              /* opaque structure */ </div><div class="line">typedef struct _jfieldID *jfieldID;   /* field IDs */ </div><div class="line"></div><div class="line">struct _jmethodID;              /* opaque structure */ </div><div class="line">typedef struct _jmethodID *jmethodID; /* method IDs */</div></pre></td></tr></table></figure></p>
+<h2 id="描述符"><a href="#描述符" class="headerlink" title="描述符"></a>描述符</h2><h3 id="类描述符"><a href="#类描述符" class="headerlink" title="类描述符"></a>类描述符</h3><p>举个例子,一个java类com.github.songnick.jni.AndroidJni，它的类描述符为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">com/github/songnick/jni/AndroidJni</div></pre></td></tr></table></figure></p>
+<p>即把.换成/</p>
+<h3 id="方法描述符"><a href="#方法描述符" class="headerlink" title="方法描述符"></a>方法描述符</h3><p>用来确定native方法的参数和返回值。<br>不多解释，直接看例子就懂：</p>
+<table>
+<thead>
+<tr>
+<th>描述符</th>
+<th>java方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“()Ljava/lang/String;”</td>
+<td>String f()</td>
+</tr>
+<tr>
+<td>“(ILjava/lang/Class;)J”</td>
+<td>long f(int i, Class c);</td>
+</tr>
+</tbody>
+</table>
+<p>括号内的是参数的数据类型描述符；</p>
+<p>括号后的湿返回值的数据类型描述符；</p>
+<h3 id="数据类型描述符"><a href="#数据类型描述符" class="headerlink" title="数据类型描述符"></a>数据类型描述符</h3><table>
+<thead>
+<tr>
+<th>描述符</th>
+<th>数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>B</td>
+<td>byte</td>
+</tr>
+<tr>
+<td>C</td>
+<td>short</td>
+</tr>
+<tr>
+<td>S</td>
+<td>char</td>
+</tr>
+<tr>
+<td>I</td>
+<td>int</td>
+</tr>
+<tr>
+<td>J</td>
+<td>long</td>
+</tr>
+<tr>
+<td>F</td>
+<td>float</td>
+</tr>
+<tr>
+<td>D</td>
+<td>double</td>
+</tr>
+<tr>
+<td>V</td>
+<td>void</td>
+</tr>
+<tr>
+<td>“Ljava/lang/String;”</td>
+<td>String</td>
+</tr>
+<tr>
+<td>“[Ljava/lang/Object;”</td>
+<td>Object[]</td>
+</tr>
+</tbody>
+</table>
+<p>引用型数据类型以L开头，以；结尾。</p>
+<p>数组用[表示，二维数组就是[[，三维数组[[[</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/25/Jni数据类型与描述符/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-几种排序算法实例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1170,82 +1380,6 @@
 
 
   
-    <article id="post-新建服务端git仓库" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/23/新建服务端git仓库/">新建服务端git仓库</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/23/新建服务端git仓库/" class="archive-article-date">
-  	<time datetime="2017-09-23T11:58:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在服务器上建立项目的git仓库，并在客户端clone仓库</p>
-<h3 id="1-在服务器上操作："><a href="#1-在服务器上操作：" class="headerlink" title="1.在服务器上操作："></a>1.在服务器上操作：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd ~</div><div class="line">mkdir repertory //建立一个名为repertory的目录，所有项目git仓库都放在这个目录下面</div><div class="line">cd repertory</div><div class="line">git init --bare project1.git //建立project1项目的git仓库</div><div class="line">git init --bare project2.git //建立project2项目的git仓库</div></pre></td></tr></table></figure>
-<p>以上操作完成后，project1.git目录就是project1这个项目的git仓库了，服务器上的仓库，一般不checkout代码，只有git版本管理的文件，成为裸仓库</p>
-<h3 id="2-在客户端上操作："><a href="#2-在客户端上操作：" class="headerlink" title="2.在客户端上操作："></a>2.在客户端上操作：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">git clone user@192.168.45.4:/home/repertory/project1.git //克隆project1</div><div class="line">git clone user@192.168.45.4:/home/repertory/project2.git //克隆project2</div><div class="line"></div><div class="line"></div><div class="line">本地的可以：</div><div class="line">git clone file:///home/repertory/project1.git</div><div class="line">git clone file:///home/repertory/project2.git</div></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/23/新建服务端git仓库/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1343,19 +1477,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
+                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1363,7 +1489,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1371,7 +1505,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
+                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">热修复</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1384,10 +1526,6 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
