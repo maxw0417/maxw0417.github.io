@@ -159,6 +159,89 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-java泛型" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/java泛型/">java泛型</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/java泛型/" class="archive-article-date">
+  	<time datetime="2017-09-26T05:51:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>java的泛型是在编译器中完成的，或者说，java的泛型是写给编译器看的，当编译器编译的时候，会分析泛型代码，将泛型擦除，换上具体的类型，并生成字节码文件（.class），这叫做“类型擦除”。所以编译过后，就没有泛型信息了，都是具体的类型。</p>
+<h2 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h2><p>当泛型定义在类上，这个泛型就作用于整个类。<br>当类定义的时候，就已经明确了泛型的类型。<br>凡是使用了类上定义的泛型的方法，操作的类也就固定了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span></span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Teacher</span></span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//注意类上的泛型定义的位置，在类上定义的泛型，作用域是整个类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Tool</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">private</span> T t;</div><div class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> t;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T t)</span></span>&#123;</div><div class="line">        <span class="keyword">this</span>.t = t;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Tool&lt;Student&gt; t1 = <span class="keyword">new</span> Tool&lt;Student&gt;();<span class="comment">//提前指定类型</span></div><div class="line">        t1.set(<span class="keyword">new</span> Student());</div><div class="line">        t1.set(<span class="keyword">new</span> Teacher());<span class="comment">//编译时就报错</span></div><div class="line">        </div><div class="line">        Tool&lt;Teader&gt; t2 = <span class="keyword">new</span> Tool&lt;Student&gt;();</div><div class="line">        t2.set(<span class="keyword">new</span> Teacher());        </div><div class="line">            </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Tool</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(T t)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show:"</span>+t);    </div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">//注意方法上泛型的定义的位置，在方法上定义的泛型，作用域只是该方法</span></div><div class="line">    <span class="comment">//&lt;Q&gt;是在定义泛型，而(Q q)表示方法的参数使用了该泛型</span></div><div class="line">    <span class="keyword">public</span> &lt;Q&gt; <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(Q q)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"println:"</span>+q);    </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">//定义类的同时，就指定了作用于整个类的泛型的具体类型：string </span></div><div class="line">        Tool&lt;String&gt; t = <span class="keyword">new</span> Tool&lt;String&gt;();  </div><div class="line">          </div><div class="line">        <span class="comment">//由于show方法使用的是类上的泛型，所以只能传入string类型的参数</span></div><div class="line">        t.show(<span class="string">"aaaa"</span>); </div><div class="line">        </div><div class="line">        <span class="comment">//print方法上定义了泛型，而方法的参数使用这个泛型，当调用方法时，通过传入的参数的类型，确定泛型的具体类型</span></div><div class="line"></div><div class="line">        t.print(<span class="number">12</span>);    </div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Inter</span>&lt;<span class="title">T</span>&gt;</span>&#123;</div><div class="line">    <span class="function">publi <span class="keyword">void</span> <span class="title">show</span><span class="params">(T t)</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//第一种，实现类在实现接口的时候就明确了泛型的具体类型</span></div><div class="line"><span class="keyword">public</span> Impl implements Inter&lt;String&gt; &#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">        System.out.println(s);    </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//第二种，实现类在实现接口的时候，也没有明确泛型的具体类型，需要使用类的时候才指定类型</span></div><div class="line"><span class="keyword">public</span> Impl2&lt;T&gt; implements Inter&lt;T&gt; &#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(T t)</span> </span>&#123;</div><div class="line">        System.out.println(s);    </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123; </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">mian</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">//由于类在定义的时候已经指定了具体类型，所以这里就不需要指定类型了</span></div><div class="line">        Impl i = <span class="keyword">new</span> Impl();</div><div class="line">        i.show(<span class="string">"aaaa"</span>);</div><div class="line">     </div><div class="line">        <span class="comment">//由于雷灾定义的时候没有指定具体类型，所以在使用类的时候，需要指定具体类型   </span></div><div class="line">        Impl2&lt;String&gt; i2 = <span class="keyword">new</span> Impl2&lt;String&gt;();</div><div class="line">        i2.show(<span class="string">"bbb"</span>);</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="泛型的好处"><a href="#泛型的好处" class="headerlink" title="泛型的好处"></a>泛型的好处</h2><p>泛型的好处就是将类型指定的时间延后，不需要在定义的时候就指定类型，只要在使用的时候指定具体类型就ok了，例如类上的泛型，使得类不用在定义的时候就指定类型，而只要在使用这个类的时候指定就可以了。而方法上的泛型，不需要在方法定义的时候就指定好类型，只要在方法调用的时候指定类型就可以了（具体类型的参数）。</p>
+<h2 id="泛型通配符"><a href="#泛型通配符" class="headerlink" title="泛型通配符"></a>泛型通配符</h2><p>在指定泛型类型的时候，往往都是确定的某个具体的类型，但是，如果无法确定具体类型，该怎么办？这就需要用到通配符了。<br>把一个对象分为声明、使用两部分的话。泛型侧重于类型的声明上代码复用，通配符则侧重于使用上的代码复用。泛型用于定义内部数据类型的不确定性，通配符则用于定义使用的对象类型不确定性。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Entity</span></span>&#123;</div><div class="line">List&lt;String&gt; l1;</div><div class="line">List&lt;?&gt; l2;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以上，两个list,在使用的时候，都需要指定具体的类型，l1指定了具体类型string，而l2并不确定将存放什么类型的数据，因此用?来表示任意类型。</p>
+<h3 id="泛型的限定"><a href="#泛型的限定" class="headerlink" title="泛型的限定"></a>泛型的限定</h3><p>有上界的通配符,例如：<br>List&lt;? extends Animal&gt;</p>
+<p>有下界的通配符，例如：<br>List&lt;? exntends Animal&gt;</p>
+<p>上下边界不可以同时使用，以下就是错误的：<br>List&lt;? extends Object super Integer&gt;</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java基础</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/java泛型/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-多线程的一些示例代码" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1306,84 +1389,9 @@
 
 
   
-    <article id="post-随笔" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/23/随笔/">随笔</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/23/随笔/" class="archive-article-date">
-  	<time datetime="2017-09-23T14:19:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/img/cmj.jpg" alt="image"></p>
-<p><img src="/img/touxiang.jpg" alt="image"></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/23/随笔/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
     </nav>
   
 
@@ -1482,11 +1490,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1506,15 +1514,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">linux c</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">web</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">linux c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">java基础</a>
               </li>
              
               <li class="article-tag-list-item">
