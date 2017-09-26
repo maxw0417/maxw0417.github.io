@@ -159,6 +159,199 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Android触摸事件分发机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/23/Android触摸事件分发机制/">Android触摸事件分发机制</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/23/Android触摸事件分发机制/" class="archive-article-date">
+  	<time datetime="2017-09-23T11:49:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。<br>View的相关函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>viewgroup的相关函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// viewgoup中独有的函数，默认返回false，即不拦截事件，事件将从父view传递到子view的dispatchTouchEvent中去。</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onInterceptTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">//注意，viewgroup中dispatchTouchEvent已经被override了。</span></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="dispatchTouchEvent"><a href="#dispatchTouchEvent" class="headerlink" title="dispatchTouchEvent"></a>dispatchTouchEvent</h3><pre><code>控件中第一个收到事件的就是dispatchTouchEvent函数，起到分发作用，此函数在view和viewgroup中都有，但实现并不相同，因此作用也有所区别。在view中，dispatchTouchEvent最终会调用view的onTouch方法对事件进行处理。在viewgroup中，会先通过onInterceptTouchEvent判断是否需要拦截事件，如果需要拦截，事件就流入自己的onTouchEvent中进行处理，如果不拦截，事件将传入子view（或viewgroup）的dispatchTouchEvent中。dispatchTouchEvent返回false时，事件流入父view的onTouchEvent方法中。
+</code></pre><h3 id="onTouchEvent"><a href="#onTouchEvent" class="headerlink" title="onTouchEvent"></a>onTouchEvent</h3><p>1、viewgroup，view中都有<br>2、处理touch事件的地方，若返回true，表示事件处理完毕，若返回false，事件将返回至父viewgroup的onTouch中进行处理。</p>
+<h3 id="onInterceptTouchEvent"><a href="#onInterceptTouchEvent" class="headerlink" title="onInterceptTouchEvent"></a>onInterceptTouchEvent</h3><p>1、此函数时viewgroup中才有，view中是没有的<br>2、在默认实现下，此函数是viewgroup用来判断是否拦截事件的依据，若onInterceptTouchEvent返回值是false，则viewgroup不会拦截此事件，事件将继续传递给子view，若返回值是true，则viewgroup会拦截此事件，将事件送往viewgroup的onTouchEvent中进行处理</p>
+<p>###move、up事件与down事件的关系<br>down事件是一组触摸事件的开始，它决定了后续事件，例如move、up等事件的走向。<br>实际上，down事件最终流向哪里（被哪个view消费掉），后续的所有事件也都流向同一个地方，由同一个view消费。</p>
+<p><br><br><br></p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><h4 id="事件是从外层view逐步往内层view传递的"><a href="#事件是从外层view逐步往内层view传递的" class="headerlink" title="事件是从外层view逐步往内层view传递的"></a>事件是从外层view逐步往内层view传递的</h4><p>view中消费事件的地方有两个，onTouchEvent方法以及dispatchTouchEvent方法，这两个方法只要返回true，就表示事件被消费了，不会被继续传递了</p>
+<h4 id="每一层view都可以做出三种决定"><a href="#每一层view都可以做出三种决定" class="headerlink" title="每一层view都可以做出三种决定"></a>每一层view都可以做出三种决定</h4><p>1.自己消费：<br>对于view来说，默认就是自己消费，即view的dispatchTouchEvent会将事件送入自己的onTouchEvent进行处理。<br>对于viewgroup来说，需要在onInterceptTouchEvent方法种返回true，这样事件就将被送往自己的onTouchEvent进行处理。<br>2.传递给内层<br>对于view来说，没有内层的view了，所以不存在继续往内层传递的情况。<br>对于viewgroup来说，只要onInterceptTouchEvent方法返回false，就会通过调用内层view的dispatchTouchEvent，将事件送入内层的view中。<br>3.返回给外层<br>这里说的返回给外层，实际上并不是直接返回去，而是内层和自己都已经处理过一遍了，只不过并没有“消费掉”，也就是onTouchEvent没有返回true，dispatchTouchEvent也没有返回true，所以事件被逐层往外层退回去。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件分发</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/23/Android触摸事件分发机制/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Glide的简单使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/23/Glide的简单使用/">Glide的简单使用</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/23/Glide的简单使用/" class="archive-article-date">
+  	<time datetime="2017-09-23T11:20:47.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://blog.csdn.net/u013005791/article/details/74532091" target="_blank" rel="external">http://blog.csdn.net/u013005791/article/details/74532091</a></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>glide具有获取，解码和展示视频剧照，图片，动画等功能，创建glide的主要目的，一个是实现平滑的列表滚动效果，另一个是支持远程图片的获取，大小调整展示。它的api使开发者可以将glide应用在几乎任何网络协议里面。</p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>1.可配置程度高，自适应程度高</p>
+<p>2.支持常见的图片格式，jpg，png，gif等</p>
+<p>3.高效缓存策略，支持memory和disk图片缓存，默认bitmap格式rgb_565内存使用减少一半</p>
+<p>4.生命周期和activity／fragment等组件的生命周期绑定</p>
+<p>5.搞笑处理bitmap，使用bitmap poll使bitmap服用，主动调用recycle回收，减小系统压力</p>
+<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>在build.gradle中添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">comile &apos;com.github.bumptech.glide:glide:3.7.0&apos;</div></pre></td></tr></table></figure></p>
+<h3 id="设定绑定生命周期"><a href="#设定绑定生命周期" class="headerlink" title="设定绑定生命周期"></a>设定绑定生命周期</h3><p>让加载图片的请求的生命周期动态管理起来<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//绑定context</span></div><div class="line">Glide.with(Context contenxt);</div><div class="line"></div><div class="line"><span class="comment">//绑定activity</span></div><div class="line">Glide.with(Activity activity);</div><div class="line"></div><div class="line"><span class="comment">//绑定fragment</span></div><div class="line">Glide.with(Fragment fragment);</div></pre></td></tr></table></figure></p>
+<h3 id="简单的加载图片实例"><a href="#简单的加载图片实例" class="headerlink" title="简单的加载图片实例"></a>简单的加载图片实例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).into(imageview);</div></pre></td></tr></table></figure>
+<h3 id="设置加载中以及加载失败的图片"><a href="#设置加载中以及加载失败的图片" class="headerlink" title="设置加载中以及加载失败的图片"></a>设置加载中以及加载失败的图片</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).placeholder(R.mimap.ic_luncher).error(R.mipmap.ic_error).into(imageview);</div></pre></td></tr></table></figure>
+<h3 id="设置跳过内存缓存"><a href="#设置跳过内存缓存" class="headerlink" title="设置跳过内存缓存"></a>设置跳过内存缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).skipMemoryCache(<span class="keyword">true</span>).into(imageview);</div></pre></td></tr></table></figure>
+<h3 id="设置下载优先级"><a href="#设置下载优先级" class="headerlink" title="设置下载优先级"></a>设置下载优先级</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).priority(Priority.NORMAL).into(imageView);</div></pre></td></tr></table></figure>
+<h3 id="设置缓存策略"><a href="#设置缓存策略" class="headerlink" title="设置缓存策略"></a>设置缓存策略</h3><p>以下表示缓存所有尺寸的图片到disk<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageUrl).diskCacheStrategy(DisCacheStrategy.ALL).into(imageView);</div></pre></td></tr></table></figure></p>
+<p>all:缓存原资源和转换后的资源（原尺寸和裁剪后的尺寸）</p>
+<p>none：不做磁盘缓存</p>
+<p>source：缓存原资源</p>
+<p>result：缓存转换后的资源</p>
+<h3 id="设置动画"><a href="#设置动画" class="headerlink" title="设置动画"></a>设置动画</h3><p>提供了几个常用动画，例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Glide</div><div class="line">    .with(context)</div><div class="line">    .load(UsageExampleListViewAdapter.eatFoodyImages[<span class="number">0</span>])</div><div class="line">    .placeholder(R.mipmap.ic_launcher) <span class="comment">// can also be a drawable</span></div><div class="line">    .error(R.mipmap.future_studio_launcher) <span class="comment">// will be displayed if the image cannot be loaded</span></div><div class="line">    .crossFade()</div><div class="line">    .into(imageViewFade);</div><div class="line"></div><div class="line"></div><div class="line">Clide.with(<span class="keyword">this</span>).load(imageurl).animate(R.anim.item_alpha_in).into(imageview);</div></pre></td></tr></table></figure></p>
+<h3 id="设置缩略图支持"><a href="#设置缩略图支持" class="headerlink" title="设置缩略图支持"></a>设置缩略图支持</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(url).thumbnail(<span class="number">0.1f</span>).into(imageview)</div></pre></td></tr></table></figure>
+<p>第二种方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">loadImageThumbnailRequest</span><span class="params">()</span> </span>&#123;  </div><div class="line">    <span class="comment">// setup Glide request without the into() method</span></div><div class="line">    DrawableRequestBuilder&lt;String&gt; thumbnailRequest = Glide</div><div class="line">        .with( context )</div><div class="line">        .load( eatFoodyImages[<span class="number">2</span>] );</div><div class="line"></div><div class="line">    <span class="comment">// pass the request as a a parameter to the thumbnail request</span></div><div class="line">    Glide</div><div class="line">        .with( context )</div><div class="line">        .load( UsageExampleGifAndVideos.gifUrl )</div><div class="line">        .thumbnail( thumbnailRequest )</div><div class="line">        .into( imageView3 );</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="设置加载尺寸"><a href="#设置加载尺寸" class="headerlink" title="设置加载尺寸"></a>设置加载尺寸</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(url).orride(<span class="number">800</span>,<span class="number">800</span>).into(imageview);</div></pre></td></tr></table></figure>
+<h3 id="设置动态转换"><a href="#设置动态转换" class="headerlink" title="设置动态转换"></a>设置动态转换</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(url).centerCrop().into(imageView)</div></pre></td></tr></table></figure>
+<p>api提供了比如：centerCrop()、fitCenter()等函数也可以通过自定义Transformation，举例说明：比如一个人圆角转化器<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlideRoundTransform</span> <span class="keyword">extends</span> <span class="title">BitmapTransformation</span> </span>&#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">float</span> radius = <span class="number">0f</span>;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">GlideRoundTransform</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">            <span class="keyword">this</span>(context, <span class="number">4</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">GlideRoundTransform</span><span class="params">(Context context, <span class="keyword">int</span> dp)</span> </span>&#123;</div><div class="line">            <span class="keyword">super</span>(context);</div><div class="line">            <span class="keyword">this</span>.radius = Resources.getSystem().getDisplayMetrics().density * dp;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> Bitmap <span class="title">transform</span><span class="params">(BitmapPool pool, Bitmap toTransform, <span class="keyword">int</span> outWidth, <span class="keyword">int</span> outHeight)</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> roundCrop(pool, toTransform);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> Bitmap <span class="title">roundCrop</span><span class="params">(BitmapPool pool, Bitmap source)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> (source == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line"></div><div class="line">            Bitmap result = pool.get(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);</div><div class="line">            <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</div><div class="line">                result = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);</div><div class="line">            &#125;</div><div class="line">            Canvas canvas = <span class="keyword">new</span> Canvas(result);</div><div class="line">            Paint paint = <span class="keyword">new</span> Paint();</div><div class="line">            paint.setShader(<span class="keyword">new</span> BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));</div><div class="line">            paint.setAntiAlias(<span class="keyword">true</span>);</div><div class="line">            RectF rectF = <span class="keyword">new</span> RectF(<span class="number">0f</span>, <span class="number">0f</span>, source.getWidth(), source.getHeight());</div><div class="line">            canvas.drawRoundRect(rectF, radius, radius, paint);</div><div class="line">            <span class="keyword">return</span> result;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> getClass().getName() + Math.round(radius);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>使用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageUrl).transform(<span class="keyword">new</span> GlideRoundTransform(<span class="keyword">this</span>)).into(imageview);</div></pre></td></tr></table></figure></p>
+<p>CenterCrop</p>
+<p>CenterCrop()是一个裁剪技术，即缩放图像让它填充到 ImageView 界限内并且裁剪额外的部分。ImageView 会被完全填充，但图像可能不会完整显示。</p>
+<p>FitCenter</p>
+<p>fitCenter() 是一个裁剪技术，即缩放图像让图像都测量出来等于或小于 ImageView 的边界范围。该图像将会完全显示，但可能不会填满整个 ImageView。</p>
+<p>Glide从网络下载到的图片，会按照两种格式来下载，一种是centerCrop，一种是fitCenter，一旦下载下来后，设置到ImageView的时候，还会根据ImageView的scaleType来确立图片位置。<br>如果Glide没有手动调用过centerCrop和fitCenter，那么Glide从网络下载的图片格式，由ImageView的scaleType决定，如果scaleType是center_crop，那么Glide以centerCrop下载图片，如果scaleType是 FIT_CENTER，FIT_START，FIT_END，那么Glide以fitCenter格式下载图片。不过根据我这边的测试结果发现，如果scaleType是CENTER，CENTER_INSIDE，MATRIX，Glide也是以fitCenter格式下载图片的。</p>
+<h3 id="设置要加载的内容"><a href="#设置要加载的内容" class="headerlink" title="设置要加载的内容"></a>设置要加载的内容</h3><p>项目中有很多需要先下载图片然后再做一些合成的功能，比如项目中出现的图文混排，实现如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).centerCrop().into(<span class="keyword">new</span> SimpleTarget&lt;GlideDrawable&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResourceReady</span><span class="params">(GlideDrawable resource, GlideAnimation&lt;? <span class="keyword">super</span> GlideDrawable&gt; glideAnimation)</span> </span>&#123;</div><div class="line">                imageView.setImageDrawable(resource);</div><div class="line">            &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<h3 id="设置监听请求接口"><a href="#设置监听请求接口" class="headerlink" title="设置监听请求接口"></a>设置监听请求接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(url).lintener(<span class="keyword">new</span> RequestLinstener&lt;String, ClideDrawable&gt;()&#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onException</span><span class="params">(Exception e, String model, Target&lt;GlideDrawable&gt; target, <span class="keyword">boolean</span> isFirstResource)</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onResourceReady</span><span class="params">(GlideDrawable resource, String model, Target&lt;GlideDrawable&gt; target, <span class="keyword">boolean</span> isFromMemoryCache, <span class="keyword">boolean</span> isFirstResource)</span> </span>&#123;</div><div class="line">                <span class="comment">//imageView.setImageDrawable(resource);</span></div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">    </div><div class="line">&#125;).into(imageview)</div></pre></td></tr></table></figure>
+<h3 id="设置动态gif加载方式"><a href="#设置动态gif加载方式" class="headerlink" title="设置动态gif加载方式"></a>设置动态gif加载方式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).asBitmap().into(imageview); <span class="comment">// 现实gif静态图片</span></div><div class="line"></div><div class="line">Glide.with(<span class="keyword">this</span>).load(imageurl).asGif().into(imageview);<span class="comment">//现实gif动态图片</span></div></pre></td></tr></table></figure>
+<h3 id="缓存的动态清理"><a href="#缓存的动态清理" class="headerlink" title="缓存的动态清理"></a>缓存的动态清理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Glide.get(<span class="keyword">this</span>).clearDiskCache();<span class="comment">//清理磁盘缓存 需要在子线程中执行</span></div><div class="line"></div><div class="line">Glide.get(<span class="keyword">this</span>).clearMemory();<span class="comment">//清理内存缓存，可以在ui中进行</span></div></pre></td></tr></table></figure>
+<h2 id="GlideModule的使用"><a href="#GlideModule的使用" class="headerlink" title="GlideModule的使用"></a>GlideModule的使用</h2><p>GlideModule是一个抽象方法，全局改变glide行为的一个方式，通过全局glidemodule配置glide，用glidebuilder设置选项，用glide注册modelloader等</p>
+<h3 id="1-自定义glidemodule"><a href="#1-自定义glidemodule" class="headerlink" title="1.自定义glidemodule"></a>1.自定义glidemodule</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyGlideModule</span> <span class="keyword">implements</span> <span class="title">GlideModule</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applyOptions</span><span class="params">(Context context, GlideBuilder builder)</span> </span>&#123;</div><div class="line">        <span class="comment">// Apply options to the builder here.</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide)</span> </span>&#123;</div><div class="line">        <span class="comment">// register ModelLoaders here.</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-在androidmanifest-xml注册"><a href="#2-在androidmanifest-xml注册" class="headerlink" title="2.在androidmanifest.xml注册"></a>2.在androidmanifest.xml注册</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- ... permissions --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta-data</span></span></div><div class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">"com.mypackage.MyGlideModule"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:value</span>=<span class="string">"GlideModule"</span> /&gt;</span></div><div class="line">        <span class="comment">&lt;!-- ... activities and other components --&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="3-添加混淆处理"><a href="#3-添加混淆处理" class="headerlink" title="3.添加混淆处理"></a>3.添加混淆处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">-keepnames class com.mypackage.MyGlideModule</div><div class="line"># or more generally:</div><div class="line">#-keep public class * implements com.bumptech.glide.module.GlideModule</div></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Glid</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/23/Glide的简单使用/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-使用Android-Studio阅读android系统源码" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -511,11 +704,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+                <a href="javascript:void(0)" class="js-tag color5">Android Studio</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -551,6 +744,10 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">优化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
@@ -583,11 +780,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">

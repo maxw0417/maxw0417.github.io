@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>使用android studio开发jni | 米兰的小铁铺</title>
+  <title>Jni注册native方法 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
+  <meta name="description" content="将java层的native方法与jni层的函数对应起来，这一过程叫做注册。有静态注册和动态注册两种方式。 静态注册通过特殊的函数名，将java层的natvie方法和jni层的函数一一对应。123456789// java层native方法public native void staticLog(); //注册的jni层对应的函数JNIEXPORT void JNICALL Java_com_git">
 <meta name="keywords" content="Jni">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用android studio开发jni">
-<meta property="og:url" content="http://yoursite.com/2017/09/26/使用android-studio开发jni/index.html">
+<meta property="og:title" content="Jni注册native方法">
+<meta property="og:url" content="http://yoursite.com/2017/09/26/Jni注册native方法/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
-<meta property="og:description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
-<meta property="og:updated_time" content="2017-09-26T11:03:35.000Z">
+<meta property="og:description" content="将java层的native方法与jni层的函数对应起来，这一过程叫做注册。有静态注册和动态注册两种方式。 静态注册通过特殊的函数名，将java层的natvie方法和jni层的函数一一对应。123456789// java层native方法public native void staticLog(); //注册的jni层对应的函数JNIEXPORT void JNICALL Java_com_git">
+<meta property="og:updated_time" content="2017-09-26T11:31:16.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用android studio开发jni">
-<meta name="twitter:description" content="主要步骤1.Android Studio设置命令行快捷操作 2.新建jni目录 3.修改module下的build.gradle文件 4.修改project下的gradle.properties文件 5.编写java类 6.创建头文件 7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件 8.执行ndk-build，生成so库文件 9.运">
+<meta name="twitter:title" content="Jni注册native方法">
+<meta name="twitter:description" content="将java层的native方法与jni层的函数对应起来，这一过程叫做注册。有静态注册和动态注册两种方式。 静态注册通过特殊的函数名，将java层的natvie方法和jni层的函数一一对应。123456789// java层native方法public native void staticLog(); //注册的jni层对应的函数JNIEXPORT void JNICALL Java_com_git">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
   
@@ -162,57 +162,30 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-使用android-studio开发jni" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Jni注册native方法" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      使用android studio开发jni
+      Jni注册native方法
     </h1>
   
 
         
-        <a href="/2017/09/26/使用android-studio开发jni/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:03:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+        <a href="/2017/09/26/Jni注册native方法/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:30:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><p>1.Android Studio设置命令行快捷操作</p>
-<p>2.新建jni目录</p>
-<p>3.修改module下的build.gradle文件</p>
-<p>4.修改project下的gradle.properties文件</p>
-<p>5.编写java类</p>
-<p>6.创建头文件</p>
-<p>7.在jni目录下编写 MyLibrary.cpp、Android.mk、Application.mk这三个文件</p>
-<p>8.执行ndk-build，生成so库文件</p>
-<p>9.运行app</p>
-<h2 id="Android-Studio设置命令行快捷操作"><a href="#Android-Studio设置命令行快捷操作" class="headerlink" title="Android Studio设置命令行快捷操作"></a>Android Studio设置命令行快捷操作</h2><p>打开Preferences，选择External Tools</p>
-<h3 id="添加javah"><a href="#添加javah" class="headerlink" title="添加javah"></a>添加javah</h3><p>program:$JDKPath$/bin/javah</p>
-<p>paramters:-classpath $Classpath$ -v -jni $FileClass$</p>
-<p>Working directory:$SourcepathEntry$/../jni</p>
-<h3 id="添加ndk-build"><a href="#添加ndk-build" class="headerlink" title="添加ndk-build"></a>添加ndk-build</h3><p>program:/home/zjf/tools/ndk/ndk-build</p>
-<p>paramters:</p>
-<p>Working directory:$ProjectFileDir$/app/src/main</p>
-<h3 id="添加ndk-build-clean"><a href="#添加ndk-build-clean" class="headerlink" title="添加ndk-build clean"></a>添加ndk-build clean</h3><p>program:/home/zjf/tools/ndk/ndk-build</p>
-<p>paramters:clean</p>
-<p>Working directory:$ProjectFileDir$/app/src/main</p>
-<h2 id="新建jni目录"><a href="#新建jni目录" class="headerlink" title="新建jni目录"></a>新建jni目录</h2><p>右击app—NEW—Folder—Jni Folder</p>
-<p>生成的jni目录位置：AndroidStudioProjects/JniDemo/app/src/main/jni</p>
-<h2 id="修改module下的build-gradle文件"><a href="#修改module下的build-gradle文件" class="headerlink" title="修改module下的build.gradle文件"></a>修改module下的build.gradle文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ndk&#123;</div><div class="line">    moduleName &quot;JniDemo&quot;</div><div class="line">&#125;</div><div class="line">sourceSets.main&#123;</div><div class="line">    jni.srcDirs = []</div><div class="line">    jniLibs.srcDir &quot;src/main/libs&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="修改project下的gradle-properties文件"><a href="#修改project下的gradle-properties文件" class="headerlink" title="修改project下的gradle.properties文件"></a>修改project下的gradle.properties文件</h2><p>如果没有这个文件，新建一个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">android.useDeprecatedNdk=true</div></pre></td></tr></table></figure></p>
-<h2 id="编写java类"><a href="#编写java类" class="headerlink" title="编写java类"></a>编写java类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class JniInterface &#123;</div><div class="line"></div><div class="line">    static &#123;</div><div class="line">        System.loadLibrary(&quot;jnidemo&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public native String setAndGetString(String str);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="创建头文件"><a href="#创建头文件" class="headerlink" title="创建头文件"></a>创建头文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">右击JniInterface.java---External tools---javah</div></pre></td></tr></table></figure>
-<p>生成如下文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/AndroidStudioProjects/JniDemo/app/src/main/jni/com_maxw_jnidemo_jni_JniInterface.h</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#include &lt;jni.h&gt;</div><div class="line"></div><div class="line">#ifndef _Included_com_maxw_jnidemo_jni_JniInterface</div><div class="line">#define _Included_com_maxw_jnidemo_jni_JniInterface</div><div class="line">#ifdef __cplusplus</div><div class="line">extern &quot;C&quot; &#123;</div><div class="line">#endif</div><div class="line"></div><div class="line">JNIEXPORT void JNICALL Java_com_maxw_jnidemo_jni_JniInterface_setString</div><div class="line">  (JNIEnv *, jobject, jstring);</div><div class="line"></div><div class="line">#ifdef __cplusplus</div><div class="line">&#125;</div><div class="line">#endif</div><div class="line">#endif</div></pre></td></tr></table></figure>
-<h2 id="在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件"><a href="#在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件" class="headerlink" title="在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件"></a>在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件</h2><p>Android.mk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">LOCAL_PATH := $(call my-dir)</div><div class="line"></div><div class="line">include $(CLEAR_VARS)</div><div class="line"></div><div class="line">LOCAL_MODULE := JniDemo</div><div class="line">LOCAL_SRC_FILES =: JniInterface.cpp</div><div class="line">include $(BUILD_SHARED_LIBRARY)</div></pre></td></tr></table></figure></p>
-<p>Application.mk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">APP_MODULES := JniDemo</div><div class="line">APP_ABI := all</div></pre></td></tr></table></figure></p>
-<h2 id="执行ndk-build，生成so库文件"><a href="#执行ndk-build，生成so库文件" class="headerlink" title="执行ndk-build，生成so库文件"></a>执行ndk-build，生成so库文件</h2><p>右击jni目录—External tools—ndk-build</p>
-<h2 id="运行app"><a href="#运行app" class="headerlink" title="运行app"></a>运行app</h2><p>略</p>
+        <p>将java层的native方法与jni层的函数对应起来，这一过程叫做注册。有静态注册和动态注册两种方式。</p>
+<h2 id="静态注册"><a href="#静态注册" class="headerlink" title="静态注册"></a>静态注册</h2><p>通过特殊的函数名，将java层的natvie方法和jni层的函数一一对应。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// java层native方法</div><div class="line">public native void staticLog(); </div><div class="line"></div><div class="line">//注册的jni层对应的函数</div><div class="line">JNIEXPORT void JNICALL Java_com_github_songnick_jni_AndroidJni_staticLog (JNIEnv *env, jobject obj)</div><div class="line">&#123;</div><div class="line">      LOGE(&quot;static register log &quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="动态注册"><a href="#动态注册" class="headerlink" title="动态注册"></a>动态注册</h2><p>动态注册可以是java层的native方法和jni层的任意函数对应起来，而不需要有函数名等方面的要求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">// java层native方法</div><div class="line">public native void dynamicLog();</div><div class="line"></div><div class="line">// jni层</div><div class="line">static void nativeDynamicLog(JNIEnv *evn, jobject obj)&#123;</div><div class="line"></div><div class="line">    LOGE(&quot;hell main&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">// java层native函数名，Java层native方法的描述符，jni层函数指针</div><div class="line">JNINativeMethod nativeMethod[] = &#123;&#123;&quot;dynamicLog&quot;, &quot;()V&quot;, (void*)nativeDynamicLog&#125;&#125;;</div><div class="line"></div><div class="line">JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) &#123;</div><div class="line"></div><div class="line">    JNIEnv *env;</div><div class="line">    if (jvm-&gt;GetEnv((void**) &amp;env, JNI_VERSION_1_4) != JNI_OK) &#123;</div><div class="line"></div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line">    LOGE(&quot;JNI_OnLoad comming&quot;);</div><div class="line">    jclass clz = env-&gt;FindClass(&quot;com/github/songnick/jni/AndroidJni&quot;);//java层native函数所在的类</div><div class="line"></div><div class="line">    env-&gt;RegisterNatives(clz, nativeMethod, sizeof(nativeMethod)/sizeof(nativeMethod[0]));</div><div class="line"></div><div class="line">    return JNI_VERSION_1_4;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="JNI-OnLoad函数"><a href="#JNI-OnLoad函数" class="headerlink" title="JNI_OnLoad函数"></a>JNI_OnLoad函数</h2><p>当我们使用System.loadLibarary()方法加载so库的时候，Java虚拟机就会找到这个函数并调用该函数，因此可以在该函数中做一些初始化的动作，其实这个函数就是相当于Activity中的onCreate()方法。</p>
 
       
 
@@ -303,7 +276,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/使用android-studio开发jni/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/09/26/Jni注册native方法/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -317,18 +290,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/09/26/Anroid-触摸事件传递机制总结/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/09/26/android的内存优化/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Anroid 触摸事件传递机制总结
+          android的内存优化
         
       </div>
     </a>
   
   
-    <a href="/2017/09/26/jni使用的基本步骤/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">jni使用的基本步骤</div>
+    <a href="/2017/09/26/贝塞尔曲线画圆/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">贝塞尔曲线画圆</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -355,7 +328,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#主要步骤"><span class="toc-number">1.</span> <span class="toc-text">主要步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android-Studio设置命令行快捷操作"><span class="toc-number">2.</span> <span class="toc-text">Android Studio设置命令行快捷操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#添加javah"><span class="toc-number">2.1.</span> <span class="toc-text">添加javah</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加ndk-build"><span class="toc-number">2.2.</span> <span class="toc-text">添加ndk-build</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加ndk-build-clean"><span class="toc-number">2.3.</span> <span class="toc-text">添加ndk-build clean</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建jni目录"><span class="toc-number">3.</span> <span class="toc-text">新建jni目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改module下的build-gradle文件"><span class="toc-number">4.</span> <span class="toc-text">修改module下的build.gradle文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改project下的gradle-properties文件"><span class="toc-number">5.</span> <span class="toc-text">修改project下的gradle.properties文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写java类"><span class="toc-number">6.</span> <span class="toc-text">编写java类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建头文件"><span class="toc-number">7.</span> <span class="toc-text">创建头文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在jni目录下编写-JniInterface-cpp、Android-mk、Application-mk这三个文件"><span class="toc-number">8.</span> <span class="toc-text">在jni目录下编写 JniInterface.cpp、Android.mk、Application.mk这三个文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#执行ndk-build，生成so库文件"><span class="toc-number">9.</span> <span class="toc-text">执行ndk-build，生成so库文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行app"><span class="toc-number">10.</span> <span class="toc-text">运行app</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#静态注册"><span class="toc-number">1.</span> <span class="toc-text">静态注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态注册"><span class="toc-number">2.</span> <span class="toc-text">动态注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JNI-OnLoad函数"><span class="toc-number">3.</span> <span class="toc-text">JNI_OnLoad函数</span></a></li></ol>
                     </div>
                 </span>
             </div>
