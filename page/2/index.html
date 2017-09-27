@@ -159,6 +159,83 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Jni注册native方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/26/Jni注册native方法/">Jni注册native方法</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/26/Jni注册native方法/" class="archive-article-date">
+  	<time datetime="2017-09-26T11:30:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>将java层的native方法与jni层的函数对应起来，这一过程叫做注册。有静态注册和动态注册两种方式。</p>
+<h2 id="静态注册"><a href="#静态注册" class="headerlink" title="静态注册"></a>静态注册</h2><p>通过特殊的函数名，将java层的natvie方法和jni层的函数一一对应。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// java层native方法</div><div class="line">public native void staticLog(); </div><div class="line"></div><div class="line">//注册的jni层对应的函数</div><div class="line">JNIEXPORT void JNICALL Java_com_github_songnick_jni_AndroidJni_staticLog (JNIEnv *env, jobject obj)</div><div class="line">&#123;</div><div class="line">      LOGE(&quot;static register log &quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="动态注册"><a href="#动态注册" class="headerlink" title="动态注册"></a>动态注册</h2><p>动态注册可以是java层的native方法和jni层的任意函数对应起来，而不需要有函数名等方面的要求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">// java层native方法</div><div class="line">public native void dynamicLog();</div><div class="line"></div><div class="line">// jni层</div><div class="line">static void nativeDynamicLog(JNIEnv *evn, jobject obj)&#123;</div><div class="line"></div><div class="line">    LOGE(&quot;hell main&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">// java层native函数名，Java层native方法的描述符，jni层函数指针</div><div class="line">JNINativeMethod nativeMethod[] = &#123;&#123;&quot;dynamicLog&quot;, &quot;()V&quot;, (void*)nativeDynamicLog&#125;&#125;;</div><div class="line"></div><div class="line">JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) &#123;</div><div class="line"></div><div class="line">    JNIEnv *env;</div><div class="line">    if (jvm-&gt;GetEnv((void**) &amp;env, JNI_VERSION_1_4) != JNI_OK) &#123;</div><div class="line"></div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line">    LOGE(&quot;JNI_OnLoad comming&quot;);</div><div class="line">    jclass clz = env-&gt;FindClass(&quot;com/github/songnick/jni/AndroidJni&quot;);//java层native函数所在的类</div><div class="line"></div><div class="line">    env-&gt;RegisterNatives(clz, nativeMethod, sizeof(nativeMethod)/sizeof(nativeMethod[0]));</div><div class="line"></div><div class="line">    return JNI_VERSION_1_4;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="JNI-OnLoad函数"><a href="#JNI-OnLoad函数" class="headerlink" title="JNI_OnLoad函数"></a>JNI_OnLoad函数</h2><p>当我们使用System.loadLibarary()方法加载so库的时候，Java虚拟机就会找到这个函数并调用该函数，因此可以在该函数中做一些初始化的动作，其实这个函数就是相当于Activity中的onCreate()方法。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/26/Jni注册native方法/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-贝塞尔曲线画圆" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -960,95 +1037,6 @@
 
 
   
-    <article id="post-jni使用的基本步骤" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/26/jni使用的基本步骤/">jni使用的基本步骤</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/26/jni使用的基本步骤/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:01:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><ol>
-<li><p>编辑java文件，在java加入native方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public static native String getStringFromC() ;</div></pre></td></tr></table></figure>
-</li>
-<li><p>使用javah生成头文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">javah com.demo.jni.HelloJni //包名.类名</div><div class="line">javah -d jni com.demo.jni.HelloJni // -d指定头文件生成后存放的路径</div><div class="line"></div><div class="line">//生成</div><div class="line">com_demo_jni_HelloJni.h</div><div class="line"></div><div class="line"></div><div class="line">// 生成的头文件函数</div><div class="line">/*</div><div class="line"> * Class:     com_zeno_jni_HelloJni</div><div class="line"> * Method:    getStringFormC</div><div class="line"> * Signature: ()Ljava/lang/String;</div><div class="line"> */</div><div class="line">JNIEXPORT jstring JNICALL Java_com_demo_jni_HelloJni_getStringFromC</div><div class="line">  (JNIEnv *, jclass);</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>注意，如果java层的native方法是静态的，这里的函数的第二个参数是jclass，如果是非静态的，就是jobject。</p>
-<ol>
-<li><p>编写c文件，include生成的头文件，实现头文件中的函数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">JNIEXPORT jstring JNICALL Java_com_demo_jni_HelloJni_getStringFromC</div><div class="line">(JNIEnv *Env, jclass jclazz) &#123;</div><div class="line"></div><div class="line">    return (*Env)-&gt;NewStringUTF(Env, &quot;Jni C String&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>编译生成动态链接库文件</p>
-</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Jni</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/26/jni使用的基本步骤/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1158,19 +1146,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">系统源码分析</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Glid</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1186,11 +1174,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
+                <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">动画</a>
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
