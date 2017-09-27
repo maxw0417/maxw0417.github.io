@@ -15,7 +15,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/09/26/android蓝牙的基本用法/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
 <meta property="og:description" content="蓝牙4.0标准蓝牙4.0包含两个蓝牙标准，传统蓝牙（又叫经典蓝牙）和低功耗蓝牙（BLE） 传统蓝牙用于数据量比较大，例如语音，音乐等。BLE蓝牙主要用于实时性要求高的，例如遥控类的操作，鼠标，键盘，传感设备的数据发送，如心跳带，血压计。 传统蓝牙有三个功率级别，分别适应100m,10m, 1m的传输距离。低功耗蓝牙无功率级别，空旷环境，20米没问题。 android蓝牙模块api的主要功能1.扫描">
-<meta property="og:updated_time" content="2017-09-26T10:38:52.000Z">
+<meta property="og:updated_time" content="2017-09-26T12:00:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android蓝牙的基本用法">
 <meta name="twitter:description" content="蓝牙4.0标准蓝牙4.0包含两个蓝牙标准，传统蓝牙（又叫经典蓝牙）和低功耗蓝牙（BLE） 传统蓝牙用于数据量比较大，例如语音，音乐等。BLE蓝牙主要用于实时性要求高的，例如遥控类的操作，鼠标，键盘，传感设备的数据发送，如心跳带，血压计。 传统蓝牙有三个功率级别，分别适应100m,10m, 1m的传输距离。低功耗蓝牙无功率级别，空旷环境，20米没问题。 android蓝牙模块api的主要功能1.扫描">
@@ -205,10 +205,13 @@
 <h3 id="ble的实用步骤"><a href="#ble的实用步骤" class="headerlink" title="ble的实用步骤"></a>ble的实用步骤</h3><h4 id="扫描蓝牙设备"><a href="#扫描蓝牙设备" class="headerlink" title="扫描蓝牙设备"></a>扫描蓝牙设备</h4><p>BluetoothAdapter中的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 扫描uuid指定的蓝牙设备</span></div><div class="line">startLeScan(UUID[] serviceUuids, BluetoothAdapter.LeScanCallback callback) </div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 扫描所有蓝牙设备</span></div><div class="line">startLeScan(BluetoothAdapter.LeScanCallback callback)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 停止扫描</span></div><div class="line">stopLeScan(BluetoothAdapter.LeScanCallback callback)</div></pre></td></tr></table></figure></p>
 <h4 id="连接蓝牙设备"><a href="#连接蓝牙设备" class="headerlink" title="连接蓝牙设备"></a>连接蓝牙设备</h4><p>BluetoothDevice中的方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 第二个参数表示是否需要自动连接。如果设置为 true, 表示如果设备断开了，会不断的尝试自动连接。设置为 false 表示只进行一次连接尝试。</span></div><div class="line"><span class="comment">// 第三个参数是回调函数，类似的方法还有好几个</span></div><div class="line"><span class="function">BluetoothGatt	<span class="title">connectGatt</span><span class="params">(Context context, <span class="keyword">boolean</span> autoConnect, BluetoothGattCallback callback)</span></span></div></pre></td></tr></table></figure></p>
 <p>如果以上第二个参数是false，获取到gatt对象后，还需要调用gatt对象的方法：<br>BluetoothGatt中的方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boolean connect()</div></pre></td></tr></table></figure></p>
-<p>BluetoothGattCallback的回调方法有：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">### 发现服务</div><div class="line">BluetoothGattCalbackl#onConnectionStateChang 方法被成功回调且表示成功连接之后调用 BluetoothGatt#discoverService 这一个方法。当这一个方法被调用之后，系统会异步执行发现服务的过程，直到 BluetoothGattCallback#onServicesDiscovered 被系统回调之后，手机设备和蓝牙设备才算是真正建立了可通信的连接。</div><div class="line"></div><div class="line">至此，蓝牙连接完成，下面就是数据传输了</div><div class="line"></div><div class="line">#### 读取数据</div><div class="line"></div><div class="line">#### 写入数据</div><div class="line">链接成功后，可以在链接成功的回调中的Bluetoothgatt对象，通过它拿到bluetoothservice对象，再通过service对象拿到chara对象，然后操作以下两部：</div></pre></td></tr></table></figure></p>
+<p>BluetoothGattCallback的回调方法有：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">### 发现服务</div><div class="line">BluetoothGattCalbackl#onConnectionStateChang 方法被成功回调且表示成功连接之后调用 BluetoothGatt#discoverService 这一个方法。当这一个方法被调用之后，系统会异步执行发现服务的过程，直到 BluetoothGattCallback#onServicesDiscovered 被系统回调之后，手机设备和蓝牙设备才算是真正建立了可通信的连接。</div><div class="line"></div><div class="line">至此，蓝牙连接完成，下面就是数据传输了</div><div class="line"></div><div class="line">#### 读取数据</div><div class="line">接成功后，可以在链接成功的回调中的Bluetoothgatt对象，通过它拿到bluetoothservice对象，再通过service对象拿到chara对象，然后：</div></pre></td></tr></table></figure></p>
+<p>BluetoothGattCharactristic#readCharacteristic()//读取数据</p>
+<p>读取成功后，回调函数的onCharacteristicRead会响应，可以在里面getValue，这样就读到数据了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#### 写入数据</div><div class="line">链接成功后，可以在链接成功的回调中的Bluetoothgatt对象，通过它拿到bluetoothservice对象，再通过service对象拿到chara对象，然后操作以下两部：</div></pre></td></tr></table></figure></p>
 <p>BluetoothGattCharactristic#setValue()//设置要写入的数据，注意，最多是20个字节，超过就需要分包传送<br>BluetoothGattCharactristic#writeCharacteristic()//写入</p>
-<p>写入成功后，回调函数的onCharacteristicWrite会响应，可以在里面getValue，检查一下。<br>```</p>
-<h4 id="断开链接"><a href="#断开链接" class="headerlink" title="断开链接"></a>断开链接</h4><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2></uses-permission>
+<p>写入成功后，回调函数的onCharacteristicWrite会响应，可以在里面getValue，检查一下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#### 监听并读取数据</div><div class="line">```java</div><div class="line">mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);</div><div class="line"></div><div class="line">BluetoothGattDescriptor descriptor = characteristic.getDescriptor(</div><div class="line">        UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));</div><div class="line">descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);</div><div class="line">mBluetoothGatt.writeDescriptor(descriptor);</div></pre></td></tr></table></figure></p>
+<h4 id="断开链接"><a href="#断开链接" class="headerlink" title="断开链接"></a>断开链接</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 1</span></div><div class="line">BluetoothGatt.disconnect()</div><div class="line"></div><div class="line"><span class="comment">// 2 触发状态变化的回调</span></div><div class="line">BluetoothGattCallback.onConnectionStateChange ()</div><div class="line"></div><div class="line"><span class="comment">// 3 在第2步中，如果发现状态是BluetoothProfile.STATE_DISCONNECTED，则执行：</span></div><div class="line">BluetoothGattCallback.close();</div></pre></td></tr></table></figure>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2></uses-permission>
       
 
       
@@ -510,19 +513,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">web</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">git</a>
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">linux c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -534,19 +537,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
