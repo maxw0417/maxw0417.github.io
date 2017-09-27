@@ -371,9 +371,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <hr>
-<p>date: 2016-09-21 16:49<br>status: public</p>
-<h2 id="title-四大组件-Service"><a href="#title-四大组件-Service" class="headerlink" title="title: 四大组件:Service"></a>title: 四大组件:Service</h2><p>Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
+        <p>Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
 <h2 id="service与thread的选择"><a href="#service与thread的选择" class="headerlink" title="service与thread的选择"></a>service与thread的选择</h2><p>那么，在service中执行任务，和在activity中执行任务，有什么区别的？有什么有的情况最好使用service来完成工作？<br>1.在activity中启动异步线程，当activity进入后台后，进程将变成一个后台进程，而如果在service中进行工作，则时一个服务进程，优先级高于后台进程，比较不容易被杀死。<br>2.activity压入后台之后，容易被系统回收掉，此时异步任务还会继续运行，但处于失控状态。<br>3.一些工作并不依赖或者说并不需要关心前台交互的情况，甚至说有的工作就是完全在后台进行的，不需要前台界面，这样就要用srvice。</p>
 <p>其实thread和service不是一个级别的东西，service和activity一样，是系统组件，他们都可以看作是thread的载体，service的存活力比activity强，生命周期比activity长，因此有些工作需要在service中进行创建异步线程进行工作。另外也可以在application中启动异步任务，但是不如服务进程有限度高，进程容易被杀死。</p>
 <blockquote>
@@ -1350,15 +1348,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">web</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">

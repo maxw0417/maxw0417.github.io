@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>android四大组件之Service | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="date: 2016-09-21 16:49status: public title: 四大组件:ServiceService 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I">
+  <meta name="description" content="Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。 service与thread的选择那么，在service">
 <meta property="og:type" content="article">
 <meta property="og:title" content="android四大组件之Service">
 <meta property="og:url" content="http://yoursite.com/2017/09/27/android四大组件之Service/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
-<meta property="og:description" content="date: 2016-09-21 16:49status: public title: 四大组件:ServiceService 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I">
+<meta property="og:description" content="Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。 service与thread的选择那么，在service">
 <meta property="og:image" content="http://yoursite.com/2017/09/27/android四大组件之Service/~/service_lifecycle.png">
-<meta property="og:updated_time" content="2017-09-27T01:31:27.000Z">
+<meta property="og:updated_time" content="2017-09-27T01:39:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android四大组件之Service">
-<meta name="twitter:description" content="date: 2016-09-21 16:49status: public title: 四大组件:ServiceService 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I">
+<meta name="twitter:description" content="Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。 service与thread的选择那么，在service">
 <meta name="twitter:image" content="http://yoursite.com/2017/09/27/android四大组件之Service/~/service_lifecycle.png">
   
     <link rel="alternative" href="/atom.xml" title="米兰的小铁铺" type="application/atom+xml">
@@ -183,9 +183,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <hr>
-<p>date: 2016-09-21 16:49<br>status: public</p>
-<h2 id="title-四大组件-Service"><a href="#title-四大组件-Service" class="headerlink" title="title: 四大组件:Service"></a>title: 四大组件:Service</h2><p>Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
+        <p>Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
 <h2 id="service与thread的选择"><a href="#service与thread的选择" class="headerlink" title="service与thread的选择"></a>service与thread的选择</h2><p>那么，在service中执行任务，和在activity中执行任务，有什么区别的？有什么有的情况最好使用service来完成工作？<br>1.在activity中启动异步线程，当activity进入后台后，进程将变成一个后台进程，而如果在service中进行工作，则时一个服务进程，优先级高于后台进程，比较不容易被杀死。<br>2.activity压入后台之后，容易被系统回收掉，此时异步任务还会继续运行，但处于失控状态。<br>3.一些工作并不依赖或者说并不需要关心前台交互的情况，甚至说有的工作就是完全在后台进行的，不需要前台界面，这样就要用srvice。</p>
 <p>其实thread和service不是一个级别的东西，service和activity一样，是系统组件，他们都可以看作是thread的载体，service的存活力比activity强，生命周期比activity长，因此有些工作需要在service中进行创建异步线程进行工作。另外也可以在application中启动异步任务，但是不如服务进程有限度高，进程容易被杀死。</p>
 <blockquote>
@@ -369,7 +367,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#title-四大组件-Service"><span class="toc-number">1.</span> <span class="toc-text">title: 四大组件:Service</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#service与thread的选择"><span class="toc-number">2.</span> <span class="toc-text">service与thread的选择</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#本地service与远程service"><span class="toc-number">2.1.</span> <span class="toc-text">本地service与远程service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#前台service和后台service"><span class="toc-number">2.2.</span> <span class="toc-text">前台service和后台service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service的启动与绑定"><span class="toc-number">2.3.</span> <span class="toc-text">service的启动与绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service的生命周期"><span class="toc-number">2.4.</span> <span class="toc-text">service的生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service标签"><span class="toc-number">2.5.</span> <span class="toc-text">service标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式intent启动service的报错问题"><span class="toc-number">2.6.</span> <span class="toc-text">隐式intent启动service的报错问题</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#service与thread的选择"><span class="toc-number">1.</span> <span class="toc-text">service与thread的选择</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#本地service与远程service"><span class="toc-number">1.1.</span> <span class="toc-text">本地service与远程service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#前台service和后台service"><span class="toc-number">1.2.</span> <span class="toc-text">前台service和后台service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service的启动与绑定"><span class="toc-number">1.3.</span> <span class="toc-text">service的启动与绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service的生命周期"><span class="toc-number">1.4.</span> <span class="toc-text">service的生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#service标签"><span class="toc-number">1.5.</span> <span class="toc-text">service标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式intent启动service的报错问题"><span class="toc-number">1.6.</span> <span class="toc-text">隐式intent启动service的报错问题</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -521,15 +519,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">web</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
