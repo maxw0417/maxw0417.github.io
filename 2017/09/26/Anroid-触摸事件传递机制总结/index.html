@@ -9,13 +9,13 @@
   <title>Anroid 触摸事件传递机制总结 | 米兰的小铁铺</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
-<meta name="keywords" content="事件传递">
+<meta name="keywords" content="事件分发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Anroid 触摸事件传递机制总结">
 <meta property="og:url" content="http://yoursite.com/2017/09/26/Anroid-触摸事件传递机制总结/index.html">
 <meta property="og:site_name" content="米兰的小铁铺">
 <meta property="og:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
-<meta property="og:updated_time" content="2017-09-26T11:09:25.000Z">
+<meta property="og:updated_time" content="2017-09-27T01:32:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Anroid 触摸事件传递机制总结">
 <meta name="twitter:description" content="view的事件分发过程，是一个u型的模型，从最外层的view往最里层的view传递，外层的view可以决定事件是在自己这层处理掉，还是继续往里层传，亦或是直接传回到更外面一层，这整套传递的逻辑就是view的事件分发机制。 View的相关函数：123456789// 如果view是clickable，longclickable，contextclickable，返回true，否则返回falsepub">
@@ -240,7 +240,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件传递</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件分发</a>
         		</li>
       		
 		</ul>
@@ -464,15 +464,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件传递</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -484,11 +480,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
+                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -504,19 +500,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">动画</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">linux c</a>
+                <a href="javascript:void(0)" class="js-tag color3">动画</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">web</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">linux c</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -532,19 +528,19 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
