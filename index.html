@@ -159,6 +159,123 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android四大组件之Service" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/27/android四大组件之Service/">android四大组件之Service</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/27/android四大组件之Service/" class="archive-article-date">
+  	<time datetime="2017-09-27T01:30:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>date: 2016-09-21 16:49<br>status: public</p>
+<h2 id="title-四大组件-Service"><a href="#title-四大组件-Service" class="headerlink" title="title: 四大组件:Service"></a>title: 四大组件:Service</h2><p>Service 是一个可以在后台执行长时间运行操作而不使用用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
+<h2 id="service与thread的选择"><a href="#service与thread的选择" class="headerlink" title="service与thread的选择"></a>service与thread的选择</h2><p>那么，在service中执行任务，和在activity中执行任务，有什么区别的？有什么有的情况最好使用service来完成工作？<br>1.在activity中启动异步线程，当activity进入后台后，进程将变成一个后台进程，而如果在service中进行工作，则时一个服务进程，优先级高于后台进程，比较不容易被杀死。<br>2.activity压入后台之后，容易被系统回收掉，此时异步任务还会继续运行，但处于失控状态。<br>3.一些工作并不依赖或者说并不需要关心前台交互的情况，甚至说有的工作就是完全在后台进行的，不需要前台界面，这样就要用srvice。</p>
+<p>其实thread和service不是一个级别的东西，service和activity一样，是系统组件，他们都可以看作是thread的载体，service的存活力比activity强，生命周期比activity长，因此有些工作需要在service中进行创建异步线程进行工作。另外也可以在application中启动异步任务，但是不如服务进程有限度高，进程容易被杀死。</p>
+<blockquote>
+<p>进程优先级<br>有5种进程，优先级从高到低分别是：前台进程、可见进程、服务进程、后台进程、空进程。<br>进程优先级决定了系统在资源不够时杀死进程回收资源的先后顺序。前台进程最不容易被系统杀死，空进程则最先被系统杀死回收。<br><br>前台进程<br>    满足一下一点即为前台进程：<br>    1.持有一个在前台的activity<br>    2.持有一个service，并且service处于以下几种状态：<br>    （1）service与用户正在交互的Activity绑定。<br>    （2）Service是在前台运行的，即它调用了 startForeground()<br>    （3）Service正在执行它的生命周期回调函数（onCreate(), onStart(), or onDestroy()）。<br><br>可见进程<br>    进程不包含任何一个前台组件，但仍然可见：<br>    1.activity处于onPause状态<br>    2.进程有一个servcie，这个servcie和一个onPause状态的activity绑定.<br><br>服务进程<br>    如果一个进程中运行着一个service，这个service是通过 startService() 开启的，并且不属于上面两种较高优先级的情况，这个进程就是一个服务进程。<br><br>后台进程<br>    如果进程不属于上面三种情况，但是进程持有一个用户不可见的activity（activity的onStop()被调用，但是onDestroy()没有调用的状态），就认为进程是一个后台进程。<br><br>空进程<br>    如果一个进程不包含任何活跃的应用组件，则认为是空进程。</p>
+</blockquote>
+<h3 id="本地service与远程service"><a href="#本地service与远程service" class="headerlink" title="本地service与远程service"></a>本地service与远程service</h3><p>本地service：运行在本应用进程中的service。<br>远程servcie：运行在与本应用不同的进程中，可以是独立进程，也可以是其他应用的进程。进城间使用aidl通信。</p>
+<h3 id="前台service和后台service"><a href="#前台service和后台service" class="headerlink" title="前台service和后台service"></a>前台service和后台service</h3><p>service默认为后台service。<br>service设置为前台后，将更不容易被系统回收。<br>设置方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Notification notification;</div><div class="line"></div><div class="line"><span class="keyword">int</span> id;</div><div class="line"></div><div class="line"><span class="comment">//api5之后，需要一个notification来将service设置为前台servcie</span></div><div class="line">startForeground(id, notification);</div></pre></td></tr></table></figure></p>
+<h3 id="service的启动与绑定"><a href="#service的启动与绑定" class="headerlink" title="service的启动与绑定"></a>service的启动与绑定</h3><p>启动的服务<br>当应用组件（如 Activity）通过调用 startService() 启动服务时，服务即处于“启动”状态。一旦启动，服务即可在后台无限期运行，即使启动服务的组件已被销毁也不受影响。 已启动的服务通常是执行单一操作，而且不会将结果返回给调用方。例如，它可能通过网络下载或上传文件。 操作完成后，服务会自行停止运行。另外调用stopSelf()方法或者其他组件调用stopService()方法也可以停止它。停止后系统就会销毁它。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mServiceIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, MyService.class);</div><div class="line">startService(mServiceIntent);</div></pre></td></tr></table></figure></p>
+<p>绑定的服务<br>当应用组件通过调用 bindService() 绑定到服务时，服务即处于“绑定”状态。绑定服务提供了一个客户端-服务器接口，允许组件与服务进行交互、发送请求、获取结果，甚至是利用进程间通信 (IPC) 跨进程执行这些操作（客户可以通过一个IBinder接口和service进行通信。）。 仅当与另一个应用组件绑定时，绑定服务才会运行。 多个组件可以同时绑定到该服务，但全部取消绑定（组件调用unbindService()）后，该服务即会被销毁。</p>
+<blockquote>
+<p>两者并不是完全互斥的，一个startServcie启动的服务，也可以被绑定，但是这个服务不能被stopService停止，除非所有与其绑定的组件都和它unbindService()了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> ServiceConnection mConn = <span class="keyword">new</span> ServiceConnection() &#123;</div><div class="line">        <span class="keyword">private</span> IService binder;</div><div class="line">        </div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</div><div class="line">            Logger.d(<span class="string">"onServiceConnected"</span>);</div><div class="line">            </div><div class="line">            binder = (IService) service;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        <span class="comment">// 一般不会被调用,只有service意外销毁时被调用</span></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</div><div class="line">            Logger.d(<span class="string">"onServiceDisconnected"</span>);</div><div class="line">        &#125;</div><div class="line">&#125;;</div><div class="line">    </div><div class="line">    <span class="meta">@OnClick</span>(R.id.btn_bindservice)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bindService</span><span class="params">()</span> </span>&#123;</div><div class="line">        mServiceIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, MyService.class);</div><div class="line">        bindService(mServiceIntent, mConn, Service.BIND_AUTO_CREATE);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(R.id.btn_unbindservice)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unbindService</span><span class="params">()</span> </span>&#123;</div><div class="line">        unbindService(mConn);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(R.id.btn_service_interface)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">serviceInterfaceTest</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span>(binder == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> result = binder.add(<span class="number">5</span>,<span class="number">6</span>);</div><div class="line">        Toast.makeText(<span class="keyword">this</span>,<span class="string">"result="</span>+result, Toast.LENGTH_SHORT).show();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> IBinder binder;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onUnbind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onUnbuind"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onUnbind(intent);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onCreate"</span>);</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        binder  = <span class="keyword">new</span> MyBinder();</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onDestroy"</span>);</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRebind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onRebind"</span>);</div><div class="line">        <span class="keyword">super</span>.onRebind(intent);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onStartCommand"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onStartCommand(intent, flags, startId);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Nullable</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        Logger.d(<span class="string">"onBind"</span>);</div><div class="line">        <span class="keyword">return</span> binder;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyBinder</span> <span class="keyword">extends</span> <span class="title">Binder</span> <span class="keyword">implements</span> <span class="title">IService</span></span>&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> a+b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IService</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span></span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="service的生命周期"><a href="#service的生命周期" class="headerlink" title="service的生命周期"></a>service的生命周期</h3><p><img src="~/service_lifecycle.png" alt=""></p>
+<p>左边是通过startService创建的服务，右边是通过bindService创建的服务。</p>
+<ul>
+<li>onCreate<br>  此方法只会执行一次，无论服务是通过startServcie还是bindService方式创建的。<br></li>
+<li>onStartCommand<br>  通过startService创建服务时，会执行，此方法可以多次执行，startService调用了多少次，此方法就执行多少次。bindService创建服务时，此方法不会执行。<br><br>每次调用startService(Intent)的时候，都会调用该Service对象的onStartCommand(Intent,int,int)方法，然后在onStartCommand方法中做一些处理。然后我们注意到这个函数有一个int的返回值，这篇文章就是简单地讲讲int返回值的作用。<br>从Android官方文档中，我们知道onStartCommand有4种返回值：</li>
+</ul>
+<p>START_STICKY：如果service进程被kill掉，保留service的状态为开始状态，但不保留递送的intent对象。随后系统会尝试重新创建service，由于服务状态为开始状态，所以创建服务后一定会调用onStartCommand(Intent,int,int)方法。如果在此期间没有任何启动命令被传递到service，那么参数Intent将为null。<br>START_NOT_STICKY：“非粘性的”。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统将会把它置为started状态，系统不会自动重启该服务，直到startService(Intent intent)方法再次被调用;。<br>START_REDELIVER_INTENT：重传Intent。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。<br>START_STICKY_COMPATIBILITY：START_STICKY的兼容版本，但不保证服务被kill后一定能重启。</p>
+<ul>
+<li>onBind<br>  bindService时执行，同一个组件在绑定服务时，执行一次，重复绑定不执行。</li>
+<li>onUnbind<br>  组件unbindServcie解绑定服务时执行，或者与服务绑定的组件被销毁时，也会执行。</li>
+<li>onDestroy<br>  对于没有和组件绑定过的服务，通过stopService停止服务时，此方法会执行。对于和组件绑定服务，直接调用stopService是没有用的，需要所有组件都和服务解绑（unbindService）之后，再调用stopService，才会执行。另外，所有与服务绑定的组件都被销毁时，此方法也会执行。</li>
+</ul>
+<h3 id="service标签"><a href="#service标签" class="headerlink" title="service标签"></a>service标签</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">service</span> <span class="attr">android:enabled</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></div><div class="line"><span class="tag">         <span class="attr">android:exported</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></div><div class="line"><span class="tag">         <span class="attr">android:icon</span>=<span class="string">"drawable resource"</span></span></div><div class="line"><span class="tag">         <span class="attr">android:isolatedProcess</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></div><div class="line"><span class="tag">         <span class="attr">android:label</span>=<span class="string">"string resource"</span></span></div><div class="line"><span class="tag">         <span class="attr">android:name</span>=<span class="string">"string"</span></span></div><div class="line"><span class="tag">         <span class="attr">android:permission</span>=<span class="string">"string"</span></span></div><div class="line"><span class="tag">         <span class="attr">android:process</span>=<span class="string">"string"</span> &gt;</span></div><div class="line">    . . .</div><div class="line"><span class="tag">&lt;/<span class="name">service</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>android:enabled<blockquote>
+<p>service是否允许被系统实例化，true为允许，false为不允许，默认为true；</p>
+</blockquote>
+</li>
+<li>android:exported<blockquote>
+<p>service是否允许被其他应用的组件访问，true为允许，false为不允许，当为false时，只有同应用或者拥有相同userid的组件才可以访问。<br>它的默认值依赖与该服务所包含的过滤器（intent filters）。没有过滤器则意味着该服务只能通过指定明确的类名来调用，这样就是说该服务只能在应用程序的内部使用（因为其他外部使用者不会知道该服务的类名），因此这种情况下，这个属性的默认值是false。另一方面，如果至少包含了一个过滤器，则意味着该服务可以给外部的其他应用提供服务，因此默认值是true。<br>这个属性不是限制把服务暴露给其他应用程序的唯一方法。还可以使用权限来限制能够跟该服务交互的外部实体。</p>
+</blockquote>
+</li>
+<li>android:isolatedProcess<blockquote>
+<p>设置true意味着，服务会在一个特殊的进程下运行，这个进程与系统其他进程是隔离的，且没有自己的权限。与其通信的唯一途径是通过服务的API(binding and starting)。</p>
+</blockquote>
+</li>
+<li>android:permission<blockquote>
+<p>必须拥有此属性指定的权限才可以启动和绑定service,如果没有被授予此权限，startService、bindService以及stopService将不会执行，并且intent将不会被传递到service中。</p>
+</blockquote>
+</li>
+<li>android:process<blockquote>
+<p>指定了service运行的进程，通常应用的所有组件都会运行在默认的进程中，进程名同包名，application标签的process属性可以修改默认的进程名。组件可以复写process属性，以使自己运行在不同的进程中。如果进程名以“:”开始，例如android:process＝“:remote”,那么这个新进程是应用私有的，如果进程名以小写字母开始，这个service将运行在叫这个名字的全局进程中。这允许不同应用中的组件共享同一个进程，减少资源使用。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="隐式intent启动service的报错问题"><a href="#隐式intent启动service的报错问题" class="headerlink" title="隐式intent启动service的报错问题"></a>隐式intent启动service的报错问题</h3><p>android5.0开始，禁止使用隐式intent启动service,解决方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Intent mIntent = <span class="keyword">new</span> Intent();</div><div class="line">mIntent.setAction(<span class="string">"XXX.XXX.XXX"</span>);<span class="comment">//你定义的service的action</span></div><div class="line">mIntent.setPackage(getPackageName());<span class="comment">//这里你需要设置你应用的包名</span></div><div class="line">context.startService(mIntent);</div></pre></td></tr></table></figure></p>
+<p>官方文档：<a href="https://developer.android.com/guide/components/services.html" target="_blank" rel="external">https://developer.android.com/guide/components/services.html</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/27/android四大组件之Service/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-编译链接动态库和静态库" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -977,79 +1094,6 @@
 
 
   
-    <article id="post-二阶贝塞尔曲线" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/26/二阶贝塞尔曲线/">二阶贝塞尔曲线</a>
-    </h1>
-  
-
-        
-        <a href="/2017/09/26/二阶贝塞尔曲线/" class="archive-article-date">
-  	<time datetime="2017-09-26T11:26:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div></pre></td><td class="code"><pre><div class="line">package com.maxw.bezierdemo.customview;</div><div class="line"></div><div class="line">import android.content.Context;</div><div class="line">import android.graphics.Canvas;</div><div class="line">import android.graphics.Color;</div><div class="line">import android.graphics.Paint;</div><div class="line">import android.graphics.Path;</div><div class="line">import android.graphics.PointF;</div><div class="line">import android.support.annotation.Nullable;</div><div class="line">import android.util.AttributeSet;</div><div class="line">import android.view.MotionEvent;</div><div class="line">import android.view.View;</div><div class="line"></div><div class="line">public class Effect1View extends View &#123;</div><div class="line"></div><div class="line">    private Paint mPaint;           //用于曲线</div><div class="line">    private Paint mLinePaint;       //用于辅助线</div><div class="line">    private Paint mStartPaint;      //用于起点</div><div class="line">    private Paint mEndPaint;        //用于终点</div><div class="line">    private Paint mControlPaint;    //用于控制点</div><div class="line"></div><div class="line">    private PointF start;</div><div class="line">    private PointF end;</div><div class="line">    private PointF control;</div><div class="line"></div><div class="line">    private int centerX, centerY; // 视图的中心点</div><div class="line"></div><div class="line"></div><div class="line">    public Effect1View(Context context) &#123;</div><div class="line">        super(context);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public Effect1View(Context context, @Nullable AttributeSet attrs) &#123;</div><div class="line">        super(context, attrs);</div><div class="line">        start = new PointF(0, 0);</div><div class="line">        end = new PointF(0, 0);</div><div class="line">        control = new PointF(0, 0);</div><div class="line"></div><div class="line">        initPaints();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void initPaints() &#123;</div><div class="line">        mPaint = new Paint();</div><div class="line">        mPaint.setColor(Color.BLUE);</div><div class="line">        mPaint.setStrokeWidth (4);</div><div class="line">        mPaint.setStyle(Paint.Style.STROKE);</div><div class="line"></div><div class="line"></div><div class="line">        mStartPaint = new Paint();</div><div class="line">        mStartPaint.setColor(Color.RED);</div><div class="line">        mStartPaint.setStrokeWidth(20f);</div><div class="line"></div><div class="line">        mEndPaint = new Paint();</div><div class="line">        mEndPaint.setColor(Color.GREEN);</div><div class="line">        mEndPaint.setStrokeWidth(20f);</div><div class="line"></div><div class="line">        mControlPaint = new Paint();</div><div class="line">        mControlPaint.setColor(Color.BLACK);</div><div class="line">        mControlPaint.setStrokeWidth(20f);</div><div class="line"></div><div class="line">        mLinePaint = new Paint();</div><div class="line">        mLinePaint.setColor(Color.GRAY);</div><div class="line">        mLinePaint.setStrokeWidth(5f);</div><div class="line"></div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onSizeChanged(int w, int h, int oldw, int oldh) &#123;</div><div class="line">        super.onSizeChanged(w, h, oldw, oldh);</div><div class="line"></div><div class="line">        centerX = w / 2;</div><div class="line">        centerY = h / 2;</div><div class="line"></div><div class="line">        // 初始化数据点和控制点的位置</div><div class="line">        start.x = centerX - 400;</div><div class="line">        start.y = centerY;</div><div class="line"></div><div class="line">        end.x = centerX + 400;</div><div class="line">        end.y = centerY;</div><div class="line"></div><div class="line">        control.x = centerX;</div><div class="line">        control.y = centerY - 200;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDraw(Canvas canvas) &#123;</div><div class="line"></div><div class="line">        //起点</div><div class="line">        canvas.drawPoint(start.x,start.y,mStartPaint);</div><div class="line"></div><div class="line">        //终点</div><div class="line">        canvas.drawPoint(end.x, end.y, mEndPaint);</div><div class="line"></div><div class="line">        //控制点</div><div class="line">        canvas.drawPoint(control.x, control.y, mControlPaint);</div><div class="line"></div><div class="line">        //辅助线</div><div class="line">        canvas.drawLine(start.x,start.y, control.x, control.y, mLinePaint);</div><div class="line">        canvas.drawLine(control.x, control.y, end.x, end.y, mLinePaint);</div><div class="line"></div><div class="line">        //曲线</div><div class="line">        Path path = new Path();</div><div class="line">        path.moveTo(start.x ,start.y);</div><div class="line">        path.quadTo(control.x, control.y, end.x, end.y);</div><div class="line"></div><div class="line">        canvas.drawPath(path, mPaint);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean onTouchEvent(MotionEvent event) &#123;</div><div class="line">        control.x = event.getX();</div><div class="line">        control.y = event.getY();</div><div class="line"></div><div class="line">        invalidate();</div><div class="line"></div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">绘图</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/09/26/二阶贝塞尔曲线/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1151,11 +1195,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
+                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">事件分发</a>
+                <a href="javascript:void(0)" class="js-tag color1">自定义控件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1171,11 +1215,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
+                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Jni</a>
+                <a href="javascript:void(0)" class="js-tag color5">Glid</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1195,15 +1239,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">web</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">蓝牙</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">linux c</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">web</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1227,11 +1271,11 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color5">图片处理</a>
               </li>
              
               <li class="article-tag-list-item">
